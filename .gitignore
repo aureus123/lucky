@@ -1,0 +1,10 @@
+# Papers (copyrighted; only the bibliographic data is in the READMEs)
+*.pdf
+
+# OS files
+.DS_Store
+
+# Isabelle: the AFP entries are downloaded separately (see isabelle/README.md);
+# only the list of entries is kept
+isabelle/afp/*
+!isabelle/afp/ROOTS

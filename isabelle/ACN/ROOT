@@ -1,0 +1,17 @@
+session ACN = "HOL-Library" +
+  description "D. Severín, On the additive chromatic number of several families of graphs, IPL 158 (2020)"
+  options [timeout = 1800]
+  sessions
+    Girth_Chromatic
+    Undirected_Graph_Theory
+  theories
+    ACN_Basics
+    ACN_Chromatic
+    ACN_Sec2
+    ACN_Sec3
+    ACN_Sec3_Families
+    ACN_Sec4
+    ACN_Sec4_Spiders
+    ACN_Suns
+    ACN_Sec4_Sun
+    ACN_Sec5
