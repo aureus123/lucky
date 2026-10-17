@@ -74,11 +74,10 @@ lemma clique: "G.clique (Inl ` {1..q})"
 end
 
 theorem proposition_3_thin:
-  assumes "2 \<le> q" "MMS15_lemma3 (spider_verts q) (thin_edges q)"
+  assumes "2 \<le> q"
   shows "fin_sgraph.eta (spider_verts q) (thin_edges q) = cdiv (q + 1) 2"
 proof -
   interpret thin_spider q using assms(1) by unfold_locales
-  interpret G: MMS15_lemma3 "spider_verts q" "thin_edges q" by fact
   let ?r = "cdiv (q + 1) 2"
   have r: "?r = (q + 2) div 2" by (simp add: cdiv_def)
   show ?thesis

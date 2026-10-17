@@ -507,11 +507,9 @@ end
 
 theorem proposition_4:
   assumes m3: "3 \<le> m"
-    and L3: "MMS15_lemma3 (sun_verts m {1..m}) (sun_edges m (ks_base m))"
   shows "fin_sgraph.eta (sun_verts m {1..m}) (sun_edges m (ks_base m)) = cdiv (m + 2) 3"
 proof -
   interpret complete_sun m using m3 by unfold_locales (auto simp: ks_base_def all_edges_def)
-  interpret S: MMS15_lemma3 "sun_verts m {1..m}" "sun_edges m (ks_base m)" by (rule L3)
   have r: "cdiv (m + 2) 3 = ks_r m" by (simp add: cdiv_def ks_r_def)
   show ?thesis
   proof (rule order.antisym)

@@ -344,6 +344,73 @@ proof -
   then show ?thesis using mp_bound_le_iff[OF assms(2,3)] by blast
 qed
 
+text \<open>The sequence \<open>s_i\<close> is strictly decreasing, and \<open>s_i \<le> K n_i\<close> for the bound \<open>K\<close>.\<close>
+
+lemma sseq_Suc_less:
+  assumes "Suc i < length ns"
+  shows "sseq ns ! Suc i < sseq ns ! i"
+proof -
+  have i: "i < length ns" using assms by simp
+  have H: "ns ! t + (t - i) \<le> sseq ns ! i" if "i \<le> t" "t < length ns" for t
+    using sseq_le_iff[OF i, of "sseq ns ! i"] that by blast
+  have "ns ! t + (t - Suc i) \<le> sseq ns ! i - 1" if "Suc i \<le> t" "t < length ns" for t
+  proof -
+    have "ns ! t + (t - i) \<le> sseq ns ! i" using H that by simp
+    then show ?thesis using that by arith
+  qed
+  then have "sseq ns ! Suc i \<le> sseq ns ! i - 1" using sseq_le_iff[OF assms] by blast
+  moreover have "1 \<le> sseq ns ! i" using H[of "Suc i"] assms by simp
+  ultimately show ?thesis by linarith
+qed
+
+lemma sseq_less:
+  assumes "i < j" "j < length ns"
+  shows "sseq ns ! j < sseq ns ! i"
+  using assms
+proof (induction j)
+  case (Suc j)
+  then show ?case using sseq_Suc_less[of j ns] by (cases "i = j") (auto intro: less_trans)
+qed simp
+
+lemma sseq_le_mp_bound:
+  assumes "ns \<noteq> []" "\<forall>n\<in>set ns. 0 < n" "i < length ns"
+  shows "sseq ns ! i \<le> mp_bound ns * ns ! i"
+  using mp_bound_le_iff[OF assms(1,2), of "mp_bound ns"] sseq_le_iff[OF assms(3)] assms(3) by blast
+
+lemma mp_bound_pos:
+  assumes "ns \<noteq> []" "\<forall>n\<in>set ns. 0 < n"
+  shows "0 < mp_bound ns"
+proof -
+  have "0 < ns ! 0" "ns ! 0 \<le> sseq ns ! 0" using assms sseq_ge[of 0 ns] by auto
+  moreover have "sseq ns ! 0 \<le> mp_bound ns * ns ! 0" using sseq_le_mp_bound[OF assms, of 0] assms by simp
+  ultimately show ?thesis by (metis gr0I mult_0 not_le)
+qed
+
+text \<open>A set of \<open>n\<close> vertices can be labeled from \<open>[K]\<close> with any sum between \<open>n\<close> and \<open>K n\<close>.\<close>
+
+lemma exists_labeling_sum:
+  assumes "finite P"
+  shows "card P \<le> T \<Longrightarrow> T \<le> K * card P \<Longrightarrow> \<exists>g. (\<forall>v\<in>P. 1 \<le> g v \<and> g v \<le> K) \<and> sum g P = T"
+  using assms
+proof (induction P arbitrary: T rule: finite_induct)
+  case empty
+  then show ?case by simp
+next
+  case (insert x P)
+  define a where "a = min K (T - card P)"
+  have card: "card (insert x P) = Suc (card P)" using insert by simp
+  have K: "0 < K" using insert.prems card by (cases K) auto
+  have a: "1 \<le> a" "a \<le> K" using insert.prems card K by (auto simp: a_def)
+  have "card P \<le> T - a" "T - a \<le> K * card P"
+    using insert.prems card a by (auto simp: a_def min_def)
+  then obtain g where g: "\<forall>v\<in>P. 1 \<le> g v \<and> g v \<le> K" "sum g P = T - a" using insert.IH by blast
+  define g' where "g' v = (if v = x then a else g v)" for v
+  have "sum g' P = sum g P" using insert(2) by (intro sum.cong) (auto simp: g'_def)
+  then have "sum g' (insert x P) = a + (T - a)" using insert g by (simp add: g'_def)
+  moreover have "a \<le> T" using insert.prems card a by (auto simp: a_def)
+  ultimately show ?case using g a by (intro exI[of _ g']) (auto simp: g'_def)
+qed
+
 subsection \<open>Complete multipartite graphs\<close>
 
 context fin_sgraph
@@ -493,17 +560,250 @@ end
 text \<open>
   Lemma 2 is Proposition 3 of Marenco, Mydlarz and Severín (ref. [6]), together with the
   characterization of the complete multipartite digraphs that have a topological additive
-  numbering. It is not proved here: it is the assumption of this locale.
+  numbering. Both are proved here, following [6]: in a complete multipartite graph,
+  \<open>f(N(w)) = f(V) - f(V_j)\<close> for \<open>w \<in> V_j\<close>, so only the sums \<open>f(V_j)\<close> of the parts matter.
 \<close>
 
-locale MMS15_lemma2 = fin_sgraph +
-  assumes lemma_2_finite_iff:
-    "complete_multipartite Ps \<Longrightarrow> Ps \<noteq> [] \<Longrightarrow> acyclic_orientation A \<Longrightarrow>
-      eta_t A \<noteq> \<infinity> \<longleftrightarrow> (\<exists>Qs. mset Qs = mset Ps \<and> monotone A Qs)"
-  and lemma_2_value:
-    "complete_multipartite Ps \<Longrightarrow> Ps \<noteq> [] \<Longrightarrow> acyclic_orientation A \<Longrightarrow> monotone A Ps \<Longrightarrow>
-      eta_t A = enat (mp_bound (map card Ps))"
+context fin_sgraph
 begin
+
+lemma cm_part_exists:
+  assumes "complete_multipartite Ps" "v \<in> V"
+  obtains i where "i < length Ps" "v \<in> Ps ! i"
+  using assms cm_union[OF assms(1)] by (metis UnionE in_set_conv_nth)
+
+lemma cm_neighborhood:
+  assumes cm: "complete_multipartite Ps" and j: "j < length Ps" "w \<in> Ps ! j"
+  shows "neighborhood w = V - Ps ! j"
+proof
+  show "neighborhood w \<subseteq> V - Ps ! j"
+  proof
+    fix x assume "x \<in> neighborhood w"
+    then have x: "x \<in> V" "vert_adj w x" using neighborhood_subset in_neighborhood_iff by auto
+    then obtain P Q where "P \<in> set Ps" "Q \<in> set Ps" "P \<noteq> Q" "w \<in> P" "x \<in> Q" using cm_adj[OF cm] by blast
+    moreover have "P = Ps ! j" using j \<open>P \<in> set Ps\<close> \<open>w \<in> P\<close> cm_disjoint[OF cm] nth_mem by blast
+    ultimately show "x \<in> V - Ps ! j" using x cm_disjoint[OF cm] by blast
+  qed
+next
+  show "V - Ps ! j \<subseteq> neighborhood w"
+  proof
+    fix x assume x: "x \<in> V - Ps ! j"
+    then obtain i where i: "i < length Ps" "x \<in> Ps ! i" using cm_part_exists[OF cm] by blast
+    then have "Ps ! i \<noteq> Ps ! j" using x by auto
+    then have "vert_adj w x" using cm_adj[OF cm] i j nth_mem by blast
+    then show "x \<in> neighborhood w" by (simp add: in_neighborhood_iff)
+  qed
+qed
+
+lemma cm_sumN:
+  assumes "complete_multipartite Ps" "j < length Ps" "w \<in> Ps ! j"
+  shows "sumN f w + sum f (Ps ! j) = sum f V"
+proof -
+  have "Ps ! j \<subseteq> V" using cm_union[OF assms(1)] assms(2) nth_mem by blast
+  then show ?thesis unfolding sumN_def cm_neighborhood[OF assms] using finV
+    by (metis add.commute sum.subset_diff)
+qed
+
+lemma cm_arc_forward:
+  assumes cm: "complete_multipartite Ps" and A: "orientation A" and mono: "monotone A Ps"
+    and ij: "i < j" "j < length Ps" and u: "u \<in> Ps ! i" and w: "w \<in> Ps ! j"
+  shows "(u, w) \<in> A"
+proof -
+  have "Ps ! i \<noteq> Ps ! j" using cm_distinct[OF cm] ij by (simp add: nth_eq_iff_index_eq)
+  moreover have "Ps ! i \<in> set Ps" "Ps ! j \<in> set Ps" using ij by simp_all
+  ultimately have "vert_adj u w" using cm_adj[OF cm, of u w] u w by blast
+  then have "(u, w) \<in> A \<or> (w, u) \<in> A" using A by (simp add: orientation_def)
+  moreover have "(w, u) \<notin> A"
+  proof
+    assume "(w, u) \<in> A"
+    then obtain i' j' where "i' < j'" "j' < length Ps" "w \<in> Ps ! i'" "u \<in> Ps ! j'"
+      using mono by (auto simp: monotone_def)
+    then have "i' = j" "j' = i" using part_index_unique[OF cm] ij u w by (meson less_trans)+
+    then show False using ij \<open>i' < j'\<close> by simp
+  qed
+  ultimately show ?thesis by blast
+qed
+
+text \<open>Lower bound: the part sums of any topological additive numbering decrease strictly.\<close>
+
+lemma lemma_2_lower:
+  assumes cm: "complete_multipartite Ps" and ne: "Ps \<noteq> []" and A: "orientation A"
+    and mono: "monotone A Ps" and f: "top_add_numbering A k f" and k: "0 < k"
+  shows "mp_bound (map card Ps) \<le> k"
+proof -
+  let ?ns = "map card Ps"
+  let ?t = "\<lambda>i. sum f (Ps ! i)"
+  have pos: "\<forall>n\<in>set ?ns. 0 < n" using part_card_pos[OF cm] by auto
+  have nonempty: "Ps ! i \<noteq> {}" if "i < length Ps" for i using cm_nonempty[OF cm] that nth_mem by blast
+  have sub: "Ps ! i \<subseteq> V" if "i < length Ps" for i using cm_union[OF cm] that nth_mem by blast
+  have fin: "finite (Ps ! i)" if "i < length Ps" for i using sub[OF that] finV finite_subset by blast
+  have lab: "1 \<le> f v \<and> f v \<le> k" if "v \<in> V" for v using f that by (simp add: top_add_numbering_def labeling_def)
+  have dec: "?t j < ?t i" if ij: "i < j" "j < length Ps" for i j
+  proof -
+    have "Ps ! i \<noteq> {}" "Ps ! j \<noteq> {}" using nonempty ij by auto
+    then obtain u w where uw: "u \<in> Ps ! i" "w \<in> Ps ! j" by blast
+    then have "(u, w) \<in> A" using cm_arc_forward[OF cm A mono ij] by blast
+    then have "sumN f u < sumN f w" using f by (auto simp: top_add_numbering_def)
+    moreover have "sumN f u + ?t i = sum f V" using cm_sumN[OF cm _ uw(1)] ij by simp
+    moreover have "sumN f w + ?t j = sum f V" using cm_sumN[OF cm ij(2) uw(2)] by simp
+    ultimately show ?thesis by linarith
+  qed
+  have tge: "card (Ps ! i) \<le> ?t i" "?t i \<le> k * card (Ps ! i)" if "i < length Ps" for i
+    using sum_mono[of "Ps ! i" "\<lambda>_. 1" f] sum_mono[of "Ps ! i" f "\<lambda>_. k"] lab sub[OF that]
+    by (auto simp: mult.commute)
+  have gap: "?t t + (t - i) \<le> ?t i" if "i \<le> t" "t < length Ps" for i t
+    using that
+  proof (induction t)
+    case (Suc t)
+    then show ?case
+    proof (cases "i = Suc t")
+      case False
+      then have "?t (Suc t) < ?t t" using dec Suc.prems by simp
+      then show ?thesis using Suc False by (simp add: Suc_diff_le)
+    qed simp
+  qed simp
+  have "?ns ! t + (t - i) \<le> k * ?ns ! i" if "i \<le> t" "t < length ?ns" for i t
+    using tge[of t] tge[of i] gap[of i t] that by simp
+  then show ?thesis using mp_bound_le_iff[of ?ns k] ne pos by simp
+qed
+
+text \<open>Upper bound: label each part \<open>V_i\<close> with sum \<open>s_i\<close>.\<close>
+
+lemma lemma_2_upper:
+  assumes cm: "complete_multipartite Ps" and ne: "Ps \<noteq> []" and mono: "monotone A Ps"
+  shows "\<exists>f. top_add_numbering A (mp_bound (map card Ps)) f"
+proof -
+  let ?ns = "map card Ps"
+  let ?K = "mp_bound ?ns"
+  let ?s = "sseq ?ns"
+  have pos: "\<forall>n\<in>set ?ns. 0 < n" using part_card_pos[OF cm] by auto
+  have ne': "?ns \<noteq> []" using ne by simp
+  have sub: "Ps ! i \<subseteq> V" if "i < length Ps" for i using cm_union[OF cm] that nth_mem by blast
+  have "\<forall>i<length Ps. \<exists>g. (\<forall>v\<in>Ps ! i. 1 \<le> g v \<and> g v \<le> ?K) \<and> sum g (Ps ! i) = ?s ! i"
+  proof (intro allI impI)
+    fix i assume i: "i < length Ps"
+    have "card (Ps ! i) \<le> ?s ! i" using sseq_ge[of i ?ns] i by simp
+    moreover have "?s ! i \<le> ?K * card (Ps ! i)" using sseq_le_mp_bound[OF ne' pos, of i] i by simp
+    ultimately show "\<exists>g. (\<forall>v\<in>Ps ! i. 1 \<le> g v \<and> g v \<le> ?K) \<and> sum g (Ps ! i) = ?s ! i"
+      using exists_labeling_sum[of "Ps ! i"] sub[OF i] finV finite_subset by blast
+  qed
+  then obtain G where G: "\<And>i. i < length Ps \<Longrightarrow> (\<forall>v\<in>Ps ! i. 1 \<le> G i v \<and> G i v \<le> ?K) \<and> sum (G i) (Ps ! i) = ?s ! i"
+    by metis
+  define idx where "idx v = (THE i. i < length Ps \<and> v \<in> Ps ! i)" for v
+  have idx: "idx v = i" if "i < length Ps" "v \<in> Ps ! i" for v i
+    unfolding idx_def using that part_index_unique[OF cm] by (intro the_equality) auto
+  define f where "f v = G (idx v) v" for v
+  have fsum: "sum f (Ps ! i) = ?s ! i" if "i < length Ps" for i
+  proof -
+    have "sum f (Ps ! i) = sum (G i) (Ps ! i)" using idx that by (intro sum.cong) (auto simp: f_def)
+    then show ?thesis using G[OF that] by simp
+  qed
+  have "top_add_numbering A ?K f"
+    unfolding top_add_numbering_def labeling_def
+  proof (rule conjI; rule ballI)
+    fix v assume "v \<in> V"
+    then obtain i where "i < length Ps" "v \<in> Ps ! i" using cm_part_exists[OF cm] by blast
+    then show "1 \<le> f v \<and> f v \<le> ?K" using G idx by (simp add: f_def)
+  next
+    fix a assume "a \<in> A"
+    then obtain u w where a: "a = (u, w)" by (cases a)
+    then obtain i j where ij: "i < j" "j < length Ps" "u \<in> Ps ! i" "w \<in> Ps ! j"
+      using mono \<open>a \<in> A\<close> by (auto simp: monotone_def)
+    have "?s ! j < ?s ! i" using sseq_less[of i j ?ns] ij by simp
+    then show "case a of (u, w) \<Rightarrow> sumN f u < sumN f w"
+      using cm_sumN[OF cm _ ij(3), of f] cm_sumN[OF cm ij(2,4), of f] fsum ij a by fastforce
+  qed
+  then show ?thesis by blast
+qed
+
+theorem lemma_2_value:
+  assumes "complete_multipartite Ps" "Ps \<noteq> []" "acyclic_orientation A" "monotone A Ps"
+  shows "eta_t A = enat (mp_bound (map card Ps))"
+proof -
+  have A: "orientation A" using assms(3) by (simp add: acyclic_orientation_def)
+  have pos: "\<forall>n\<in>set (map card Ps). 0 < n" using part_card_pos[OF assms(1)] by auto
+  obtain f where f: "top_add_numbering A (mp_bound (map card Ps)) f"
+    using lemma_2_upper[OF assms(1,2,4)] by blast
+  have K: "0 < mp_bound (map card Ps)" using mp_bound_pos pos assms(2) by simp
+  have "eta_t A \<le> enat (mp_bound (map card Ps))" using eta_t_le[OF K f] .
+  moreover have "eta_t A \<noteq> \<infinity>" using calculation by (cases "eta_t A") auto
+  then obtain k g where "eta_t A = enat k" "0 < k" "top_add_numbering A k g"
+    using eta_t_attained by blast
+  then have "enat (mp_bound (map card Ps)) \<le> eta_t A"
+    using lemma_2_lower[OF assms(1,2) A assms(4)] by simp
+  ultimately show ?thesis by simp
+qed
+
+theorem lemma_2_finite_iff:
+  assumes cm: "complete_multipartite Ps" and ne: "Ps \<noteq> []" and A: "acyclic_orientation A"
+  shows "eta_t A \<noteq> \<infinity> \<longleftrightarrow> (\<exists>Qs. mset Qs = mset Ps \<and> monotone A Qs)"
+proof
+  assume "eta_t A \<noteq> \<infinity>"
+  then obtain k f where "0 < k" and f: "top_add_numbering A k f" using eta_t_attained by blast
+  have O: "orientation A" using A by (simp add: acyclic_orientation_def)
+  let ?key = "\<lambda>P. sum f P"
+  \<comment> \<open>an arc from part \<open>P\<close> to part \<open>Q\<close> means \<open>f(P) > f(Q)\<close>\<close>
+  have arc_key: "?key Q < ?key P"
+    if a: "(u, w) \<in> A" "P \<in> set Ps" "Q \<in> set Ps" "u \<in> P" "w \<in> Q" for u w P Q
+  proof -
+    obtain i where i: "i < length Ps" "Ps ! i = P" using a(2) by (metis in_set_conv_nth)
+    obtain j where j: "j < length Ps" "Ps ! j = Q" using a(3) by (metis in_set_conv_nth)
+    have "sumN f u < sumN f w" using f a(1) by (auto simp: top_add_numbering_def)
+    moreover have "sumN f u + sum f P = sum f V" using cm_sumN[OF cm i(1), of u f] i(2) a(4) by simp
+    moreover have "sumN f w + sum f Q = sum f V" using cm_sumN[OF cm j(1), of w f] j(2) a(5) by simp
+    ultimately show ?thesis by linarith
+  qed
+  have key_inj: "inj_on ?key (set Ps)"
+  proof (rule inj_onI)
+    fix P Q assume PQ: "P \<in> set Ps" "Q \<in> set Ps" "?key P = ?key Q"
+    show "P = Q"
+    proof (rule ccontr)
+      assume "P \<noteq> Q"
+      obtain u w where "u \<in> P" "w \<in> Q" using cm_nonempty[OF cm] PQ by (meson ex_in_conv)
+      then have "vert_adj u w" using cm_adj[OF cm] PQ \<open>P \<noteq> Q\<close> by blast
+      then have "(u, w) \<in> A \<or> (w, u) \<in> A" using O by (simp add: orientation_def)
+      then show False using arc_key PQ \<open>u \<in> P\<close> \<open>w \<in> Q\<close> by (metis less_irrefl)
+    qed
+  qed
+  define Qs where "Qs = rev (sort_key ?key Ps)"
+  have mset: "mset Qs = mset Ps" by (simp add: Qs_def)
+  have setQ: "set Qs = set Ps" using mset by (metis mset_eq_setD)
+  have sortedQ: "sorted_wrt (\<ge>) (map ?key Qs)"
+    unfolding Qs_def rev_map[symmetric] sorted_wrt_rev using sorted_sort_key[of ?key Ps]
+    by simp
+  have "monotone A Qs"
+    unfolding monotone_def
+  proof (intro ballI, clarify)
+    fix u w assume uw: "(u, w) \<in> A"
+    then have "vert_adj u w" using O by (simp add: orientation_def)
+    then obtain P Q where PQ: "P \<in> set Ps" "Q \<in> set Ps" "P \<noteq> Q" "u \<in> P" "w \<in> Q" using cm_adj[OF cm] by blast
+    then obtain i j where ij: "i < length Qs" "Qs ! i = P" "j < length Qs" "Qs ! j = Q"
+      using setQ by (metis in_set_conv_nth)
+    have "?key Q < ?key P" using arc_key[OF uw PQ(1,2,4,5)] .
+    then have "i < j"
+    proof (rule contrapos_pp)
+      assume "\<not> i < j"
+      then consider "i = j" | "j < i" by linarith
+      then show "\<not> ?key Q < ?key P"
+      proof cases
+        case 1 then show ?thesis using ij PQ(3) by simp
+      next
+        case 2
+        have "(map ?key Qs) ! i \<le> (map ?key Qs) ! j"
+          using sortedQ[unfolded sorted_wrt_iff_nth_less, rule_format, of j i] 2 ij by simp
+        then show ?thesis using ij by simp
+      qed
+    qed
+    then show "\<exists>i j. i < j \<and> j < length Qs \<and> u \<in> Qs ! i \<and> w \<in> Qs ! j" using ij PQ by blast
+  qed
+  then show "\<exists>Qs. mset Qs = mset Ps \<and> monotone A Qs" using mset by blast
+next
+  assume "\<exists>Qs. mset Qs = mset Ps \<and> monotone A Qs"
+  then obtain Qs where Qs: "mset Qs = mset Ps" "monotone A Qs" by blast
+  have "Qs \<noteq> []" using Qs(1) ne by auto
+  then show "eta_t A \<noteq> \<infinity>"
+    using lemma_2_value[OF complete_multipartite_perm[OF cm Qs(1)] _ A Qs(2)] by simp
+qed
 
 theorem theorem_1:
   assumes cm: "complete_multipartite Ps" and ne: "Ps \<noteq> []"

@@ -69,7 +69,7 @@ Proposition) has its own counter.
     $`u \in N(v)`$. Then $`\eta(G) = 1`$ if adjacent degrees always differ, and $`\eta(G) = 2`$
     otherwise. Labeling: 2 on $`U`$, 1 on $`V`$.
   - Corollary 1: regular bipartite graphs have $`\eta(G) = 2`$.
-  - Lemma 2 (ref. [6], Prop. 3), *assumed*: a complete $`r`$-partite digraph $`D`$ has
+  - Lemma 2 (ref. [6], Prop. 3; also proved in the formalization): a complete $`r`$-partite digraph $`D`$ has
     $`\eta_t(D) < \infty`$ iff it is monotone. In that case
     $`\eta_t(D) = \max_i \lceil s_i/|V_i| \rceil`$, with $`s_r = |V_r|`$ and
     $`s_i = \max\{1 + s_{i+1}, |V_i|\}`$.
@@ -99,7 +99,7 @@ Proposition) has its own counter.
     - Labeling: $`1, \dots, q-t`$ on $`Q \setminus T`$, and $`q - t + 1`$ on $`T \cup S`$.
     - With $`|T| = 1`$, $`\eta(G) \le |Q| \le \chi(G)`$: **the conjecture holds for split graphs.**
   - Proposition 2: complete splits have $`\eta(G) = |Q'|`$.
-  - Lemma 3 (ref. [6], Prop. 1), *assumed*: let the vertices of a DAG be ordered topologically, let
+  - Lemma 3 (ref. [6], Prop. 1; also proved in the formalization): let the vertices of a DAG be ordered topologically, let
     $`Q`$ be a clique of $`G(D)`$, and let $`q_F, q_L`$ be its first and last vertices. Then
     $`\eta_t(D) \ge \lceil (d(q_F) + 1)/(d(q_L) - |Q| + 2) \rceil`$.
   - Corollary 2: if $`d_1, d_2`$ are the smallest and largest degrees of a clique $`Q`$, then
@@ -210,13 +210,9 @@ Sections 1–5, with the proofs of Propositions 1–5 from the appendix, are for
   (C. Edmonds) and *Girth Chromatic* (L. Noschinski). The chromatic number is proved equal to
   Noschinski's `chromatic_number`.
 - **Status.** Everything is proved, with no `sorry`. The session checks in about 50 s.
-- **Assumptions.** The two lemmas cited from ref. [6] (Lemmas 2 and 3) are locale assumptions:
-  - Theorem 1 depends on Lemma 2;
-  - Corollary 2, and through it the lower bounds of Propositions 3 (thin spiders) and 4, depend
-    on Lemma 3.
-
-  Every other result is unconditional, including η(G) = min η_t(D) and η(P_N) = 2, which the
-  paper takes as known.
+- **No assumptions.** The two lemmas cited from ref. [6] (Lemmas 2 and 3) are proved as well, so
+  every result is unconditional. This includes η(G) = min η_t(D) and η(P_N) = 2, which the paper
+  takes as known.
 - **Requirements and installation.** [Isabelle2025-2](https://isabelle.in.tum.de) and the AFP
   entries *Undirected Graph Theory*, *Girth Chromatic* and the seven entries their ROOT files refer
   to (listed in `isabelle/afp/ROOTS`), from the [AFP](https://www.isa-afp.org/download/) release for

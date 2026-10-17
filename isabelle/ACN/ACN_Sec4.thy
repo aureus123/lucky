@@ -300,16 +300,12 @@ end
 subsection \<open>Lemma 3 and Corollary 2: a lower bound from cliques\<close>
 
 text \<open>
-  Lemma 3 is Proposition 1 of Marenco, Mydlarz and Severín (ref. [6]); it is the assumption of
-  this locale. For a clique \<open>Q\<close> of an acyclic orientation, the smallest and largest vertices of
-  \<open>Q\<close> in a topological order are the source \<open>q_F\<close> and the sink \<open>q_L\<close> of \<open>Q\<close>.
+  Lemma 3 is Proposition 1 of Marenco, Mydlarz and Severín (ref. [6]); it is proved here, following
+  [6]. For a clique \<open>Q\<close> of an acyclic orientation, the smallest and largest vertices of \<open>Q\<close> in
+  a topological order are the source \<open>q_F\<close> and the sink \<open>q_L\<close> of \<open>Q\<close>.
 \<close>
 
-locale MMS15_lemma3 = fin_sgraph +
-  assumes lemma_3:
-    "acyclic_orientation A \<Longrightarrow> clique Q \<Longrightarrow> qF \<in> Q \<Longrightarrow> qL \<in> Q \<Longrightarrow>
-      (\<And>q. q \<in> Q - {qF} \<Longrightarrow> (qF, q) \<in> A) \<Longrightarrow> (\<And>q. q \<in> Q - {qL} \<Longrightarrow> (q, qL) \<in> A) \<Longrightarrow>
-      enat (cdiv (degree qF + 1) (degree qL + 2 - card Q)) \<le> eta_t A"
+context fin_sgraph
 begin
 
 lemma clique_degree: "clique Q \<Longrightarrow> q \<in> Q \<Longrightarrow> card Q \<le> degree q + 1"
@@ -334,6 +330,114 @@ proof -
   then have "a \<le> cdiv a' b' * b" using assms by (meson le_trans mult_le_mono2)
   then show ?thesis using assms(2,3) cdiv_le_iff by simp
 qed
+
+text \<open>
+  The proof of [6]: for a topological additive \<open>k\<close>-numbering \<open>f\<close> and \<open>q \<in> Q\<close>, let
+  \<open>Y_q = f(N(q) \ Q) - f(q)\<close>. Then \<open>f(N(q)) = f(Q) + Y_q\<close>, so the \<open>Y_q\<close> are \<open>|Q|\<close> distinct
+  integers between \<open>Y_{q_F} \<ge> |N(q_F) \ Q| - k\<close> and \<open>Y_{q_L} \<le> k |N(q_L) \ Q| - 1\<close>.
+\<close>
+
+theorem lemma_3:
+  assumes A: "acyclic_orientation A" and cl: "clique Q" and qF: "qF \<in> Q" and qL: "qL \<in> Q"
+    and src: "\<And>q. q \<in> Q - {qF} \<Longrightarrow> (qF, q) \<in> A" and snk: "\<And>q. q \<in> Q - {qL} \<Longrightarrow> (q, qL) \<in> A"
+  shows "enat (cdiv (degree qF + 1) (degree qL + 2 - card Q)) \<le> eta_t A"
+proof (cases "eta_t A = \<infinity>")
+  case False
+  obtain k f where k: "eta_t A = enat k" "0 < k" and f: "top_add_numbering A k f"
+    using eta_t_attained[OF False] by blast
+  have lab: "1 \<le> f v \<and> f v \<le> k" if "v \<in> V" for v
+    using f that by (simp add: top_add_numbering_def labeling_def)
+  have arc: "sumN f u < sumN f v" if "(u, v) \<in> A" for u v
+    using f that by (auto simp: top_add_numbering_def)
+  have QV: "Q \<subseteq> V" and finQ: "finite Q" using clique_subset[OF cl] finV finite_subset by blast+
+  define Y where "Y q = int (sum f (neighborhood q - Q)) - int (f q)" for q
+  have NQ: "neighborhood q \<inter> Q = Q - {q}" if "q \<in> Q" for q
+  proof
+    show "neighborhood q \<inter> Q \<subseteq> Q - {q}" using not_in_own_neighborhood by blast
+    show "Q - {q} \<subseteq> neighborhood q \<inter> Q"
+    proof
+      fix x assume x: "x \<in> Q - {q}"
+      then have "vert_adj q x" using clique_adj[OF cl that, of x] by auto
+      then show "x \<in> neighborhood q \<inter> Q" using x by (simp add: in_neighborhood_iff)
+    qed
+  qed
+  have SY: "int (sumN f q) = int (sum f Q) + Y q" if q: "q \<in> Q" for q
+  proof -
+    have "sumN f q = sum f (neighborhood q \<inter> Q) + sum f (neighborhood q - Q)"
+      unfolding sumN_def using finite_neighborhood by (rule sum.Int_Diff)
+    also have "sum f (neighborhood q \<inter> Q) = sum f Q - f q"
+      using NQ[OF q] q finQ by (simp add: sum_diff1_nat)
+    finally have "sumN f q = sum f Q - f q + sum f (neighborhood q - Q)" .
+    moreover have "f q \<le> sum f Q" using q finQ by (simp add: member_le_sum)
+    ultimately show ?thesis by (simp add: Y_def)
+  qed
+  have Ylt: "Y u < Y v" if "u \<in> Q" "v \<in> Q" "(u, v) \<in> A" for u v
+    using arc[OF that(3)] SY[OF that(1)] SY[OF that(2)] by linarith
+  have cardNQ: "card (neighborhood q - Q) + card Q = degree q + 1" if q: "q \<in> Q" for q
+  proof -
+    have "card (neighborhood q - Q) = card (neighborhood q) - card (neighborhood q \<inter> Q)"
+      using finite_neighborhood by (simp add: card_Diff_subset_Int)
+    moreover have "card (neighborhood q \<inter> Q) = card Q - 1" using NQ[OF q] q finQ by simp
+    moreover have "card (neighborhood q \<inter> Q) \<le> card (neighborhood q)"
+      using finite_neighborhood by (simp add: card_mono)
+    moreover have "1 \<le> card Q" using q finQ by (metis One_nat_def Suc_leI card_gt_0_iff empty_iff)
+    ultimately show ?thesis by (simp add: degree_eq)
+  qed
+  have sum_bounds: "card (neighborhood q - Q) \<le> sum f (neighborhood q - Q)
+      \<and> sum f (neighborhood q - Q) \<le> k * card (neighborhood q - Q)" for q
+  proof -
+    have "\<forall>w\<in>neighborhood q - Q. 1 \<le> f w \<and> f w \<le> k" using lab neighborhood_subset by blast
+    then show ?thesis
+      using sum_mono[of "neighborhood q - Q" "\<lambda>_. 1" f] sum_mono[of "neighborhood q - Q" f "\<lambda>_. k"]
+      by (simp add: mult.commute)
+  qed
+  \<comment> \<open>pigeonhole: the \<open>|Q|\<close> distinct values \<open>Y_q\<close> lie between \<open>Y_{q_F}\<close> and \<open>Y_{q_L}\<close>\<close>
+  have inj: "inj_on Y Q"
+  proof (rule inj_onI)
+    fix u v assume uv: "u \<in> Q" "v \<in> Q" "Y u = Y v"
+    show "u = v"
+    proof (rule ccontr)
+      assume "u \<noteq> v"
+      then have "(u, v) \<in> A \<or> (v, u) \<in> A"
+        using clique_adj[OF cl uv(1,2)] A by (simp add: acyclic_orientation_def orientation_def)
+      then show False using Ylt uv by fastforce
+    qed
+  qed
+  have range: "Y ` Q \<subseteq> {Y qF..Y qL}"
+  proof
+    fix y assume "y \<in> Y ` Q"
+    then obtain q where q: "q \<in> Q" "y = Y q" by blast
+    have "Y qF \<le> Y q" using Ylt[OF qF q(1) src[of q]] q by (cases "q = qF") auto
+    moreover have "Y q \<le> Y qL" using Ylt[OF q(1) qL snk[of q]] q by (cases "q = qL") auto
+    ultimately show "y \<in> {Y qF..Y qL}" using q by simp
+  qed
+  have "card Q \<le> card {Y qF..Y qL}"
+    using card_mono[OF finite_atLeastAtMost_int range] card_image[OF inj] by simp
+  then have "card Q \<le> nat (Y qL - Y qF + 1)" by simp
+  moreover have "Y qF \<le> Y qL" using range qF by auto
+  ultimately have spread: "int (card Q) \<le> Y qL - Y qF + 1" by (simp add: le_nat_iff)
+  define a c where "a = card (neighborhood qF - Q)" and "c = card (neighborhood qL - Q)"
+  have qFV: "qF \<in> V" and qLV: "qL \<in> V" using QV qF qL by blast+
+  have "int a \<le> int (sum f (neighborhood qF - Q))" "int (f qF) \<le> int k"
+    using sum_bounds[of qF] lab[OF qFV] unfolding a_def of_nat_le_iff by simp_all
+  then have YF: "int a - int k \<le> Y qF" unfolding Y_def by linarith
+  have "int (sum f (neighborhood qL - Q)) \<le> int (k * c)"
+    using sum_bounds[of qL] unfolding c_def of_nat_le_iff by simp
+  moreover have "1 \<le> int (f qL)" using lab[OF qLV] by simp
+  ultimately have YL: "Y qL \<le> int (k * c) - 1" unfolding Y_def by linarith
+  have "degree qF + 1 \<le> k * (degree qL + 2 - card Q)"
+  proof -
+    have "degree qF + 1 = a + card Q" using cardNQ[OF qF] by (simp add: a_def)
+    moreover have "degree qL + 2 - card Q = c + 1" using cardNQ[OF qL] by (simp add: c_def)
+    moreover have "int (a + card Q) \<le> int (k * c + k)"
+      using spread YF YL by (simp only: of_nat_add)
+    then have "a + card Q \<le> k * c + k" by (simp only: of_nat_le_iff)
+    ultimately show ?thesis by (simp add: algebra_simps)
+  qed
+  then have "cdiv (degree qF + 1) (degree qL + 2 - card Q) \<le> k"
+    using cdiv_le_iff clique_degree[OF cl qL] by (simp add: mult.commute)
+  then show ?thesis using k by simp
+qed simp
 
 corollary corollary_2:
   assumes cl: "clique Q" and ne: "Q \<noteq> {}"

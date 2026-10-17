@@ -56,11 +56,11 @@ appendix of the arXiv version. See the main [README](../README.md) for the state
 |---|---|
 | `ACN_Basics` | §1: `sumN f v` = f(N(v)), `labeling`, `additive_coloring`, `eta` (η); existence of additive colorings (powers of 2); orientations, `top_add_numbering`, `eta_t` (η_t); **`eta_min_eta_t`**: η(G) = min η_t(D) over acyclic orientations; cliques; the chromatic number `chi` and `clique_le_chi`; `cdiv` (ceiling division) |
 | `ACN_Chromatic` | `chi` agrees with `chromatic_number` of *Girth Chromatic* on graphs with natural vertices (`chi_eq_chromatic_number`) |
-| `ACN_Sec2` | §2: `observation_1`, `lemma_1`, `corollary_1`; the sequence `sseq` (s_i) and `mp_bound` (max ⌈s_i/\|V_i\|⌉); `complete_multipartite`, `monotone`; locale `MMS15_lemma2` (Lemma 2, assumed); **`theorem_1`** and `theorem_1_conjecture` |
+| `ACN_Sec2` | §2: `observation_1`, `lemma_1`, `corollary_1`; the sequence `sseq` (s_i) and `mp_bound` (max ⌈s_i/\|V_i\|⌉); `complete_multipartite`, `monotone`; **`lemma_2_value`**, **`lemma_2_finite_iff`** (Lemma 2); **`theorem_1`** and `theorem_1_conjecture` |
 | `ACN_Methods` | the proof methods below (Eisbach), with their supporting rules (`eta_le_coloring`, `eta_ge_2`, `eta_eq_2`, `sum_edge_cases`, `set_eq_sum_cases`, `mod3_cases`, `mod6_cases`, `div_mod_lin`) |
 | `ACN_Sec3` | §3: `observation_2` (true twins); the join `join_edges` and locale `join_complete`; **`theorem_2`**; χ(G ∨ K_q) ≥ χ(G) + q (`J_chi_ge`) and `theorem_2_conjecture` |
 | `ACN_Sec3_Families` | paths (η(P_N) = 2 for N ≥ 4), `fan`; disjoint copies of K_p, `windmill`; circuits (η = 2 when even), **`proposition_1`** (odd circuits), `wheel` |
-| `ACN_Sec4` | §4: locale `split_graph`, **`theorem_3`**, `theorem_3_conjecture`, `split_graph_conjecture` (any split graph); locale `complete_split`, **`proposition_2`**; locale `MMS15_lemma3` (Lemma 3, assumed), **`corollary_2`** |
+| `ACN_Sec4` | §4: locale `split_graph`, **`theorem_3`**, `theorem_3_conjecture`, `split_graph_conjecture` (any split graph); locale `complete_split`, **`proposition_2`**; **`lemma_3`**, **`corollary_2`** |
 | `ACN_Sec4_Spiders` | thin and thick headless spiders: **`proposition_3_thin`**, **`proposition_3_thick`** |
 | `ACN_Suns` | the sun construction: locale `sun_graph`, its neighborhoods and sums |
 | `ACN_Sec4_Sun` | the labeling of the appendix for complete suns (`ks_q` = the permutation 𝔮, `ks_fu`, `ks_fv`), the recurrence `ks_claim`, **`proposition_4`** |
@@ -105,26 +105,31 @@ appendix of the arXiv version. See the main [README](../README.md) for the state
 
 Everything is proved: there is no `sorry`, and the session builds without `quick_and_dirty`.
 
-**What is assumed.** The two results of Marenco, Mydlarz and Severín (ref. [6]) that the paper
-cites are assumed, not proved, as locale assumptions about a given graph. No axiom is added.
-- `MMS15_lemma2` (Lemma 2 = [6], Prop. 3): for a complete multipartite graph, an acyclic
-  orientation has η_t < ∞ iff it is monotone for some ordering of the parts, and in that case
-  η_t = max ⌈s_i/|V_i|⌉. It is used by Theorem 1.
-- `MMS15_lemma3` (Lemma 3 = [6], Prop. 1): the clique bound
-  η_t(D) ≥ ⌈(d(q_F) + 1)/(d(q_L) − |Q| + 2)⌉. It is used by Corollary 2, hence by the lower bounds of
-  Propositions 3 (thin spiders) and 4.
+**Nothing is assumed.** The two results of Marenco, Mydlarz and Severín (ref. [6]) that the
+paper cites are also proved, following [6]:
+- **Lemma 2** = [6], Prop. 3 (`lemma_2_finite_iff`, `lemma_2_value` in `ACN_Sec2`). For a complete
+  multipartite graph, an acyclic orientation has η_t < ∞ iff it is monotone for some ordering of
+  the parts, and in that case η_t = max ⌈s_i/|V_i|⌉.
+  - The key fact is f(N(w)) = f(V) − f(V_j) for w ∈ V_j (`cm_sumN`), so only the part sums
+    matter.
+  - Lower bound: the part sums decrease strictly along a monotone orientation, so the sum of
+    part i is at least s_i (`lemma_2_lower`).
+  - Upper bound: each part gets labels in [K] with sum exactly s_i (`exists_labeling_sum`,
+    `lemma_2_upper`).
+  - "Finite ⇒ monotone": the parts are ordered by decreasing sum.
+- **Lemma 3** = [6], Prop. 1 (`lemma_3` in `ACN_Sec4`): the clique bound
+  η_t(D) ≥ ⌈(d(q_F) + 1)/(d(q_L) − |Q| + 2)⌉, by the pigeonhole argument of [6] on
+  Y_q = f(N(q) \ Q) − f(q).
   - In the formalization, q_F and q_L are the source and the sink of Q in the orientation. These
     are the smallest and largest vertices of Q in any topological order.
 
-Every other result is proved, including facts that the paper takes from the literature or uses
-without proof:
+So every result is unconditional, including facts that the paper takes from the literature or
+uses without proof:
 - η(K_n) = n, through windmills;
 - η(P_N) = 2, with an explicit labeling, instead of the tree bound of ref. [5];
 - η(G) = min η_t(D);
 - χ(G ∨ K_q) ≥ χ(G) + q;
 - the existence of an additive coloring of every graph.
-
-The thick spiders and Propositions 1, 2 and 5 do not depend on any assumption.
 
 **Deviations from the paper:**
 - **Theorem 1.** The lower bound uses a different argument. In the paper's proof, the step
