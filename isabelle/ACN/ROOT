@@ -4,10 +4,12 @@ session ACN = "HOL-Library" +
   sessions
     Girth_Chromatic
     Undirected_Graph_Theory
+    "HOL-Eisbach"
   theories
     ACN_Basics
     ACN_Chromatic
     ACN_Sec2
+    ACN_Methods
     ACN_Sec3
     ACN_Sec3_Families
     ACN_Sec4

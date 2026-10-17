@@ -6,7 +6,8 @@ appendix of the arXiv version. See the main [README](../README.md) for the state
 
 ## Requirements
 
-- **Isabelle2025-2**: <https://isabelle.in.tum.de>.
+- **Isabelle2025-2**: <https://isabelle.in.tum.de>. The session also loads `HOL-Eisbach`, which is
+  part of the Isabelle distribution.
 - **The AFP entries** *Undirected Graph Theory* (C. Edmonds) and *Girth Chromatic* (L. Noschinski),
   from the Archive of Formal Proofs release that matches Isabelle2025-2
   (<https://www.isa-afp.org/download/>).
@@ -56,6 +57,7 @@ appendix of the arXiv version. See the main [README](../README.md) for the state
 | `ACN_Basics` | §1: `sumN f v` = f(N(v)), `labeling`, `additive_coloring`, `eta` (η); existence of additive colorings (powers of 2); orientations, `top_add_numbering`, `eta_t` (η_t); **`eta_min_eta_t`**: η(G) = min η_t(D) over acyclic orientations; cliques; the chromatic number `chi` and `clique_le_chi`; `cdiv` (ceiling division) |
 | `ACN_Chromatic` | `chi` agrees with `chromatic_number` of *Girth Chromatic* on graphs with natural vertices (`chi_eq_chromatic_number`) |
 | `ACN_Sec2` | §2: `observation_1`, `lemma_1`, `corollary_1`; the sequence `sseq` (s_i) and `mp_bound` (max ⌈s_i/\|V_i\|⌉); `complete_multipartite`, `monotone`; locale `MMS15_lemma2` (Lemma 2, assumed); **`theorem_1`** and `theorem_1_conjecture` |
+| `ACN_Methods` | the proof methods below (Eisbach), with their supporting rules (`eta_le_coloring`, `eta_ge_2`, `eta_eq_2`, `sum_edge_cases`, `set_eq_sum_cases`, `mod3_cases`, `mod6_cases`, `div_mod_lin`) |
 | `ACN_Sec3` | §3: `observation_2` (true twins); the join `join_edges` and locale `join_complete`; **`theorem_2`**; χ(G ∨ K_q) ≥ χ(G) + q (`J_chi_ge`) and `theorem_2_conjecture` |
 | `ACN_Sec3_Families` | paths (η(P_N) = 2 for N ≥ 4), `fan`; disjoint copies of K_p, `windmill`; circuits (η = 2 when even), **`proposition_1`** (odd circuits), `wheel` |
 | `ACN_Sec4` | §4: locale `split_graph`, **`theorem_3`**, `theorem_3_conjecture`, `split_graph_conjecture` (any split graph); locale `complete_split`, **`proposition_2`**; locale `MMS15_lemma3` (Lemma 3, assumed), **`corollary_2`** |
@@ -71,6 +73,33 @@ appendix of the arXiv version. See the main [README](../README.md) for the state
   (copies of K_p), and `nat + nat` (spiders and suns: u_i = `Inl i`, v_i = `Inr i`, the hub of a
   wheel sun is `Inl 0`).
 - A labeling of a sun or spider is `case_sum fu fv`, with fu i = f(u_i) and fv i = f(v_i).
+
+## Proof methods (Eisbach)
+
+`ACN_Methods` packages the patterns that recur across the families of graphs:
+
+- **`eta_upper rule: G.eta_le_coloring`** turns `G.eta ≤ k` into two goals:
+  - the labeling condition `G.labeling k f`;
+  - the edge condition `G.vert_adj x y ⟹ G.sumN f x ≠ G.sumN f y`.
+
+  The side condition `0 < k` is closed by `simp` when possible. It is used for every explicit
+  upper bound after §2 (13 times).
+- **`eta_eq_2`** (a rule, not a method): `η ≤ 2`, plus an edge whose ends have equal degrees,
+  give `η = 2` by Observation 1. It is used for paths, cycle suns and wheel suns.
+- **`sum_edge_cases adj: xy sym: G.vert_adj_sym rr: adj_rr`** proves the edge condition on
+  graphs with vertices `Inl i` and `Inr j` (spiders and suns). It discards the impossible
+  `Inr`–`Inr` edges and reduces `Inr`–`Inl` to `Inl`–`Inr` by symmetry, leaving two goals: an
+  `Inl`–`Inl` edge and an `Inl`–`Inr` edge. It is used 8 times.
+- **`neighborhood_eq nb: G.in_neighborhood_iff simps: … dests: …`** proves `G.neighborhood v = S`
+  vertex by vertex (by constructor on sum types).
+  - It unfolds the membership rule before the simplifier runs. Otherwise `simp` first rewrites
+    `{1..m}` to `{Suc 0..m}` in the locale's vertex set, and the rule no longer matches.
+  - It is used for the neighborhoods of suns (7 times).
+- **`mod3_cases n`, `mod6_cases n`** prove arithmetic facts with several `div`/`mod` by
+  constants. They split `n` into `3t + c` (or `6t + c`) for each residue and evaluate the
+  divisions with `div_mod_lin`. They replace slow `presburger` calls in Proposition 4 (`S2`,
+  `S4`, `ident_last`). Goals with nat subtraction or nested products (`S1`, `S3`,
+  `ident_mid'`) are still proved by hand.
 
 ## Status
 

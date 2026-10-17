@@ -106,9 +106,8 @@ proof -
     moreover have "sum f Q = f u0 + sum f (Q - {u0})" using u0 finQ by (simp add: sum.remove)
     ultimately show ?thesis using flab[of u0] by linarith
   qed
-  have "additive_coloring ?c f"
-    unfolding additive_coloring_def
-  proof (intro conjI allI impI)
+  have "eta \<le> ?c"
+  proof (eta_upper rule: eta_le_coloring)
     show "labeling ?c f" using flab by (simp add: labeling_def)
   next
     fix x y assume xy: "vert_adj x y"
@@ -173,7 +172,7 @@ proof -
       qed
     qed
   qed
-  then show ?thesis by (intro eta_le) simp_all
+  then show ?thesis by simp
 qed
 
 text \<open>With \<open>|T| = 1\<close>: \<open>\<eta>(G) \<le> |Q| \<le> \<chi>(G)\<close>, so the conjecture holds for split graphs.\<close>

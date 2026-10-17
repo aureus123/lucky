@@ -63,14 +63,12 @@ lemma path_eta:
   assumes "4 \<le> N"
   shows "P.eta = 2"
 proof -
-  have "P.vert_adj 1 2" "P.degree 1 = P.degree 2" using assms by (simp_all add: adj_iff degree_eq)
-  then have "P.eta \<noteq> 1" using P.observation_1 by blast
-  moreover have "P.eta \<le> 2"
+  have adj: "P.vert_adj 1 2" "P.degree 1 = P.degree 2" using assms by (simp_all add: adj_iff degree_eq)
+  have "P.eta \<le> 2"
   proof -
     define f where "f i = (if even i \<or> i = N - 1 then 2 else 1::nat)" for i
-    have "P.additive_coloring 2 f"
-      unfolding P.additive_coloring_def
-    proof (intro conjI allI impI)
+    have "P.eta \<le> 2"
+    proof (eta_upper rule: P.eta_le_coloring)
       show "P.labeling 2 f" by (simp add: P.labeling_def f_def)
     next
       fix i j assume "P.vert_adj i j"
@@ -84,9 +82,9 @@ proof -
         then show ?thesis using assms by (simp add: sumN_eq f_def) presburger
       qed
     qed
-    then show ?thesis by (intro P.eta_le) simp_all
+    then show ?thesis by simp
   qed
-  ultimately show ?thesis using P.eta_pos by simp
+  then show ?thesis using P.eta_eq_2 adj by blast
 qed
 
 lemma path_max_degree:
@@ -149,17 +147,18 @@ proof (rule order.antisym)
     qed
     ultimately show ?thesis by (simp add: f_def)
   qed
-  have "K.additive_coloring p f"
-    unfolding K.additive_coloring_def
-  proof (intro conjI allI impI)
+  have "K.eta \<le> p"
+  proof (eta_upper rule: K.eta_le_coloring)
     show "K.labeling p f" by (auto simp: K.labeling_def f_def)
   next
     fix x y assume xy: "K.vert_adj x y"
     then have "x \<in> {..<m} \<times> {..<p}" "y \<in> {..<m} \<times> {..<p}" "f x \<noteq> f y"
       by (auto simp: adj_iff f_def mem_Times_iff)
     then show "K.sumN f x \<noteq> K.sumN f y" using sum by (metis add_left_cancel add.commute)
+  next
+    show "0 < p" using assms by simp
   qed
-  then show "K.eta \<le> p" using assms by (intro K.eta_le) simp_all
+  then show "K.eta \<le> p" using assms by simp
 next
   have "card ({0::nat} \<times> {..<p}) \<le> K.eta"
   proof (rule K.observation_2)
@@ -361,9 +360,8 @@ proof (rule order.antisym)
     qed
     finally show ?thesis .
   qed
-  have "C.additive_coloring 3 f"
-    unfolding C.additive_coloring_def
-  proof (intro conjI allI impI)
+  have "C.eta \<le> 3"
+  proof (eta_upper rule: C.eta_le_coloring)
     show "C.labeling 3 f" by (simp add: C.labeling_def f_def)
   next
     fix i j assume "C.vert_adj i j"
@@ -395,7 +393,7 @@ proof (rule order.antisym)
     show "C.sumN f i \<noteq> C.sumN f j"
       using ij neq sumS by (metis)
   qed
-  then show "C.eta \<le> 3" by (intro C.eta_le) simp_all
+  then show "C.eta \<le> 3" by simp
 next
   \<comment> \<open>lower bound: no additive 2-coloring\<close>
   show "3 \<le> C.eta"

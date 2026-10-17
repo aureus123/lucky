@@ -1,5 +1,5 @@
 theory ACN_Sec3
-  imports ACN_Sec2
+  imports ACN_Methods
 begin
 
 section \<open>Join with complete graphs (Section 3)\<close>
@@ -160,9 +160,8 @@ proof (rule order.antisym)
   have labV: "1 \<le> f v \<and> f v \<le> G.eta" if "v \<in> V" for v
     using f that by (simp add: G.additive_coloring_def G.labeling_def)
   have GsumN: "G.sumN f' v = G.sumN f v" for v using f'V by (rule G.sumN_cong)
-  have "J.additive_coloring ?k f'"
-    unfolding J.additive_coloring_def
-  proof (intro conjI allI impI)
+  have "J.eta \<le> ?k"
+  proof (eta_upper rule: J.eta_le_coloring)
     show "J.labeling ?k f'"
       unfolding J.labeling_def using f'U labV f'V by fastforce
   next
@@ -214,8 +213,10 @@ proof (rule order.antisym)
       qed
       then show ?thesis by simp
     qed
+  next
+    show "0 < ?k" using G.eta_pos by simp
   qed
-  then show "J.eta \<le> ?k" using G.eta_pos by (intro J.eta_le) auto
+  then show "J.eta \<le> ?k" using G.eta_pos by auto
 next
   \<comment> \<open>optimality: \<open>U\<close> is a set of true twins, and a coloring of the join restricts to \<open>G\<close>\<close>
   have "q \<le> J.eta"

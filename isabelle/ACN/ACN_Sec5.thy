@@ -147,20 +147,13 @@ proof -
   show ?thesis using A unfolding conv conv2 by blast
 qed
 
-lemma Bs_N: "i \<in> {1..m} \<Longrightarrow> Bs.neighborhood (Inl i) = {Inl (snext m i), Inl (sprev m i)}"
-proof (rule set_eqI)
-  fix x assume i: "i \<in> {1..m}"
-  show "x \<in> Bs.neighborhood (Inl i) \<longleftrightarrow> x \<in> {Inl (snext m i), Inl (sprev m i)}"
-  proof (cases x)
-    case (Inl j)
-    have "x \<in> Bs.neighborhood (Inl i) \<longleftrightarrow> S.vert_adj (Inl i) (Inl j)"
-      unfolding Inl Bs.in_neighborhood_iff adj_ll ..
-    then show ?thesis using adj_uu i snext_in sprev_in Inl by auto
-  next
-    case (Inr j)
-    then show ?thesis using Bs.neighborhood_subset by auto
-  qed
-qed
+lemma Bs_N:
+  assumes i: "i \<in> {1..m}"
+  shows "Bs.neighborhood (Inl i) = {Inl (snext m i), Inl (sprev m i)}"
+  by (neighborhood_eq nb: Bs.in_neighborhood_iff
+      simps: adj_ll[symmetric] adj_uu snext_in[OF i, simplified] sprev_in[OF i, simplified] i[simplified]
+      dests: Bs.vert_adj_imp_inV)
+
 
 lemma sum_u:
   assumes i: "i \<in> {1..m}"
@@ -201,40 +194,24 @@ proof -
   show ?thesis using A unfolding conv conv2 by blast
 qed
 
-lemma Bs_N: "i \<in> {1..m} \<Longrightarrow> Bs.neighborhood (Inl i) = {Inl (snext m i), Inl (sprev m i), Inl 0}"
-proof (rule set_eqI)
-  fix x assume i: "i \<in> {1..m}"
-  show "x \<in> Bs.neighborhood (Inl i) \<longleftrightarrow> x \<in> {Inl (snext m i), Inl (sprev m i), Inl 0}"
-  proof (cases x)
-    case (Inl j)
-    have "x \<in> Bs.neighborhood (Inl i) \<longleftrightarrow> S.vert_adj (Inl i) (Inl j)"
-      unfolding Inl Bs.in_neighborhood_iff adj_ll ..
-    then show ?thesis using adj_uu i snext_in sprev_in Inl by auto
-  next
-    case (Inr j)
-    then show ?thesis using Bs.neighborhood_subset by auto
-  qed
+lemma Bs_N:
+  assumes i: "i \<in> {1..m}"
+  shows "Bs.neighborhood (Inl i) = {Inl (snext m i), Inl (sprev m i), Inl 0}"
+proof -
+  have i0: "i \<noteq> 0" using i by simp
+  show ?thesis
+    by (neighborhood_eq nb: Bs.in_neighborhood_iff
+        simps: adj_ll[symmetric] adj_uu snext_in[OF i, simplified] sprev_in[OF i, simplified] i[simplified] i0
+        dests: Bs.vert_adj_imp_inV)
 qed
+
 
 lemma adj_w: "S.vert_adj (Inl 0) (Inl j) \<longleftrightarrow> j \<in> {1..m}"
   by (simp add: adj_uu)
 
 lemma Bs_N0: "Bs.neighborhood (Inl 0) = Inl ` {1..m}"
-proof (rule set_eqI)
-  fix x
-  show "x \<in> Bs.neighborhood (Inl 0) \<longleftrightarrow> x \<in> Inl ` {1..m}"
-  proof (cases x)
-    case (Inl j)
-    have "x \<in> Bs.neighborhood (Inl 0) \<longleftrightarrow> S.vert_adj (Inl 0) (Inl j)"
-      unfolding Inl Bs.in_neighborhood_iff adj_ll ..
-    then have "x \<in> Bs.neighborhood (Inl 0) \<longleftrightarrow> j \<in> {1..m}" using adj_w by simp
-    moreover have "x \<in> Inl ` {1..m} \<longleftrightarrow> j \<in> {1..m}" using Inl by auto
-    ultimately show ?thesis by simp
-  next
-    case (Inr j)
-    then show ?thesis using Bs.neighborhood_subset by auto
-  qed
-qed
+  by (neighborhood_eq nb: Bs.in_neighborhood_iff simps: adj_ll[symmetric] adj_w dests: Bs.vert_adj_imp_inV)
+
 
 lemma sum_u:
   assumes i: "i \<in> {1..m}"
@@ -265,40 +242,28 @@ proof -
     using sum_u[OF that] cs_sum_u[OF m4 that] by simp
   have sv: "S.sumN ?f (Inr j) = csV m j" if "j \<in> {1..m}" for j
     using sumN_r[OF that] cs_sum_v[OF m4 that] by simp
-  have "S.additive_coloring 2 ?f"
-    unfolding S.additive_coloring_def
-  proof (intro conjI allI impI)
+  have "S.eta \<le> 2"
+  proof (eta_upper rule: S.eta_le_coloring)
     show "S.labeling 2 ?f" unfolding S.labeling_def by (auto simp: cs_fu_def cs_fv_def split: sum.split)
   next
     fix x y assume xy: "S.vert_adj x y"
     show "S.sumN ?f x \<noteq> S.sumN ?f y"
-    proof (cases x; cases y)
-      fix i j assume xy': "x = Inl i" "y = Inl j"
-      then have ij: "i \<in> {1..m}" "j \<in> {1..m}" "j = snext m i \<or> j = sprev m i" using xy adj_uu by simp_all
-      then show ?thesis
-        using su csU_next[OF m4 ij(1)] csU_next[OF m4 ij(2)] snext_sprev[OF ij(1)] xy' by auto
+    proof (sum_edge_cases adj: xy sym: S.vert_adj_sym rr: adj_rr)
+      fix i j assume ll: "S.vert_adj (Inl i) (Inl j)"
+      then have ij: "i \<in> {1..m}" "j \<in> {1..m}" "j = snext m i \<or> j = sprev m i" using ll adj_uu by simp_all
+      then show "S.sumN ?f (Inl i) \<noteq> S.sumN ?f (Inl j)"
+        using su csU_next[OF m4 ij(1)] csU_next[OF m4 ij(2)] snext_sprev[OF ij(1)] by auto
     next
-      fix i j assume xy': "x = Inl i" "y = Inr j"
-      then have "j \<in> {1..m}" "i = j \<or> i = snext m j" using xy adj_lr by simp_all
-      then show ?thesis using su sv csV_less[OF m4] snext_in xy' by (metis less_irrefl)
-    next
-      fix i j assume xy': "x = Inr i" "y = Inl j"
-      then have "i \<in> {1..m}" "j = i \<or> j = snext m i" using xy adj_rl by simp_all
-      then show ?thesis using su sv csV_less[OF m4] snext_in xy' by (metis less_irrefl)
-    next
-      fix i j assume "x = Inr i" "y = Inr j"
-      then show ?thesis using xy adj_rr by simp
+      fix i j assume lr: "S.vert_adj (Inl i) (Inr j)"
+      then have "j \<in> {1..m}" "i = j \<or> i = snext m j" using lr adj_lr by simp_all
+      then show "S.sumN ?f (Inl i) \<noteq> S.sumN ?f (Inr j)" using su sv csV_less[OF m4] snext_in by (metis less_irrefl)
     qed
   qed
-  then have "S.eta \<le> 2" by (intro S.eta_le) simp_all
-  moreover have "S.eta \<noteq> 1"
-  proof -
-    have "S.vert_adj (Inl 1) (Inl 2)" using m4 adj_uu snext_lt[OF m4, of 1] by simp
-    moreover have "S.degree (Inl 1) = S.degree (Inl 2)"
-      using sum_u[of 1 "\<lambda>_. 1" "\<lambda>_. 1"] sum_u[of 2 "\<lambda>_. 1" "\<lambda>_. 1"] S.sumN_const_1 m4 by simp
-    ultimately show ?thesis using S.observation_1 by blast
-  qed
-  ultimately show ?thesis using S.eta_pos by simp
+  then have le2: "S.eta \<le> 2" by simp
+  have adj: "S.vert_adj (Inl 1) (Inl 2)" using m4 adj_uu snext_lt[OF m4, of 1] by simp
+  have deg: "S.degree (Inl 1) = S.degree (Inl 2)"
+    using sum_u[of 1 "\<lambda>_. 1" "\<lambda>_. 1"] sum_u[of 2 "\<lambda>_. 1" "\<lambda>_. 1"] S.sumN_const_1 m4 by simp
+  show ?thesis using S.eta_eq_2[OF le2 adj deg] .
 qed
 
 theorem proposition_5_wheel:
@@ -307,13 +272,9 @@ theorem proposition_5_wheel:
 proof -
   interpret wheel_sun m
     using m4 by unfold_locales (auto simp: ws_base_def cs_base_def snext_def)
-  have lower: "S.eta \<noteq> 1"
-  proof -
-    have "S.vert_adj (Inl 1) (Inl 2)" using m4 adj_uu snext_lt[OF m4, of 1] by simp
-    moreover have "S.degree (Inl 1) = S.degree (Inl 2)"
-      using sum_u[of 1 "\<lambda>_. 1" "\<lambda>_. 1"] sum_u[of 2 "\<lambda>_. 1" "\<lambda>_. 1"] S.sumN_const_1 m4 by simp
-    ultimately show ?thesis using S.observation_1 by blast
-  qed
+  have adj: "S.vert_adj (Inl 1) (Inl 2)" using m4 adj_uu snext_lt[OF m4, of 1] by simp
+  have deg: "S.degree (Inl 1) = S.degree (Inl 2)"
+    using sum_u[of 1 "\<lambda>_. 1" "\<lambda>_. 1"] sum_u[of 2 "\<lambda>_. 1" "\<lambda>_. 1"] S.sumN_const_1 m4 by simp
   have "S.eta \<le> 2"
   proof (cases "m = 5")
     case False
@@ -333,44 +294,36 @@ proof -
       then have "9 \<le> m + (m + 1) div 2" using m4 False by linarith
       then show ?thesis using su[OF that] sw csU_range[OF m4 that] by simp
     qed
-    have "S.additive_coloring 2 ?f"
-      unfolding S.additive_coloring_def
-    proof (intro conjI allI impI)
+    have "S.eta \<le> 2"
+    proof (eta_upper rule: S.eta_le_coloring)
       show "S.labeling 2 ?f" unfolding S.labeling_def by (auto simp: cs_fu_def cs_fv_def split: sum.split)
     next
       fix x y assume xy: "S.vert_adj x y"
       show "S.sumN ?f x \<noteq> S.sumN ?f y"
-      proof (cases x; cases y)
-        fix i j assume xy': "x = Inl i" "y = Inl j"
+      proof (sum_edge_cases adj: xy sym: S.vert_adj_sym rr: adj_rr)
+        fix i j assume ll: "S.vert_adj (Inl i) (Inl j)"
         then have "(i \<in> {1..m} \<and> j \<in> {1..m} \<and> (j = snext m i \<or> j = sprev m i))
-            \<or> (i = 0 \<and> j \<in> {1..m}) \<or> (j = 0 \<and> i \<in> {1..m})" using xy adj_uu by simp
+            \<or> (i = 0 \<and> j \<in> {1..m}) \<or> (j = 0 \<and> i \<in> {1..m})" using ll adj_uu by simp
         then consider (a) "i \<in> {1..m}" "j \<in> {1..m}" "j = snext m i \<or> j = sprev m i"
           | (b) "i = 0" "j \<in> {1..m}" | (c) "j = 0" "i \<in> {1..m}" by blast
-        then show ?thesis
+        then show "S.sumN ?f (Inl i) \<noteq> S.sumN ?f (Inl j)"
         proof cases
           case a
           note ij = a
           then show ?thesis
-            using su csU_next[OF m4 ij(1)] csU_next[OF m4 ij(2)] snext_sprev[OF ij(1)] xy' by auto
+            using su csU_next[OF m4 ij(1)] csU_next[OF m4 ij(2)] snext_sprev[OF ij(1)] by auto
         next
-          case b then show ?thesis using w_neq xy' by simp
+          case b then show ?thesis using w_neq by simp
         next
-          case c then show ?thesis using w_neq xy' by metis
+          case c then show ?thesis using w_neq by metis
         qed
       next
-        fix i j assume xy': "x = Inl i" "y = Inr j"
-        then have "j \<in> {1..m}" "i = j \<or> i = snext m j" using xy adj_lr by simp_all
-        then show ?thesis using su sv csV_less[OF m4] snext_in xy' by (metis less_SucI less_irrefl Suc_eq_plus1)
-      next
-        fix i j assume xy': "x = Inr i" "y = Inl j"
-        then have "i \<in> {1..m}" "j = i \<or> j = snext m i" using xy adj_rl by simp_all
-        then show ?thesis using su sv csV_less[OF m4] snext_in xy' by (metis less_SucI less_irrefl Suc_eq_plus1)
-      next
-        fix i j assume "x = Inr i" "y = Inr j"
-        then show ?thesis using xy adj_rr by simp
+        fix i j assume lr: "S.vert_adj (Inl i) (Inr j)"
+        then have "j \<in> {1..m}" "i = j \<or> i = snext m j" using lr adj_lr by simp_all
+        then show "S.sumN ?f (Inl i) \<noteq> S.sumN ?f (Inr j)" using su sv csV_less[OF m4] snext_in by (metis less_SucI less_irrefl Suc_eq_plus1)
       qed
     qed
-    then show ?thesis by (intro S.eta_le) simp_all
+    then show ?thesis by simp
   next
     case True
     \<comment> \<open>the special labeling of \<open>WS_5\<close>\<close>
@@ -392,48 +345,39 @@ proof -
     qed
     have sw: "S.sumN ?f (Inl 0) = 7"
       using sum_w[of fu fv] True by (simp add: fu_def numeral_eq_Suc atLeastAtMostSuc_conv)
-    have "S.additive_coloring 2 ?f"
-      unfolding S.additive_coloring_def
-    proof (intro conjI allI impI)
+    have "S.eta \<le> 2"
+    proof (eta_upper rule: S.eta_le_coloring)
       show "S.labeling 2 ?f" unfolding S.labeling_def by (auto simp: fu_def fv_def split: sum.split)
     next
       fix x y assume xy: "S.vert_adj x y"
       show "S.sumN ?f x \<noteq> S.sumN ?f y"
-      proof (cases x; cases y)
-        fix i j assume xy': "x = Inl i" "y = Inl j"
+      proof (sum_edge_cases adj: xy sym: S.vert_adj_sym rr: adj_rr)
+        fix i j assume ll: "S.vert_adj (Inl i) (Inl j)"
         then have "(i \<in> {1..m} \<and> j \<in> {1..m} \<and> (j = snext m i \<or> j = sprev m i))
-            \<or> (i = 0 \<and> j \<in> {1..m}) \<or> (j = 0 \<and> i \<in> {1..m})" using xy adj_uu by simp
+            \<or> (i = 0 \<and> j \<in> {1..m}) \<or> (j = 0 \<and> i \<in> {1..m})" using ll adj_uu by simp
         then consider (a) "i \<in> {1..m}" "j \<in> {1..m}" "j = snext m i \<or> j = sprev m i"
           | (b) "i = 0" "j \<in> {1..m}" | (c) "j = 0" "i \<in> {1..m}" by blast
-        then show ?thesis
+        then show "S.sumN ?f (Inl i) \<noteq> S.sumN ?f (Inl j)"
         proof cases
           case a
           note ij = a
           have "i = 1 \<or> i = 2 \<or> i = 3 \<or> i = 4 \<or> i = 5" using ij True by auto
-          then show ?thesis using su[OF ij(1)] su[OF ij(2)] ij(3) sn sp xy' by auto
+          then show ?thesis using su[OF ij(1)] su[OF ij(2)] ij(3) sn sp by auto
         next
-          case b then show ?thesis using su sw xy' by auto
+          case b then show ?thesis using su sw by auto
         next
-          case c then show ?thesis using su sw xy' by auto
+          case c then show ?thesis using su sw by auto
         qed
       next
-        fix i j assume xy': "x = Inl i" "y = Inr j"
-        then have "j \<in> {1..m}" "i = j \<or> i = snext m j" using xy adj_lr by simp_all
+        fix i j assume lr: "S.vert_adj (Inl i) (Inr j)"
+        then have "j \<in> {1..m}" "i = j \<or> i = snext m j" using lr adj_lr by simp_all
         then have "i \<in> {1..m}" using snext_in by auto
-        then show ?thesis using su[OF \<open>i \<in> {1..m}\<close>] sv[OF \<open>j \<in> {1..m}\<close>] xy' by auto
-      next
-        fix i j assume xy': "x = Inr i" "y = Inl j"
-        then have "i \<in> {1..m}" "j = i \<or> j = snext m i" using xy adj_rl by simp_all
-        then have "j \<in> {1..m}" using snext_in by auto
-        then show ?thesis using su[OF \<open>j \<in> {1..m}\<close>] sv[OF \<open>i \<in> {1..m}\<close>] xy' by auto
-      next
-        fix i j assume "x = Inr i" "y = Inr j"
-        then show ?thesis using xy adj_rr by simp
+        then show "S.sumN ?f (Inl i) \<noteq> S.sumN ?f (Inr j)" using su[OF \<open>i \<in> {1..m}\<close>] sv[OF \<open>j \<in> {1..m}\<close>] by auto
       qed
     qed
-    then show ?thesis by (intro S.eta_le) simp_all
+    then show ?thesis by simp
   qed
-  then show ?thesis using lower S.eta_pos by simp
+  then show ?thesis using S.eta_eq_2 adj deg by blast
 qed
 
 end

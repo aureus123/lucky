@@ -108,10 +108,7 @@ lemma adj_rl: "S.vert_adj (Inr j) (Inl i) \<longleftrightarrow> j \<in> {1..m} \
 lemma N_r:
   assumes "j \<in> {1..m}"
   shows "S.neighborhood (Inr j) = {Inl j, Inl (snext m j)}"
-proof (rule set_eqI)
-  fix x show "x \<in> S.neighborhood (Inr j) \<longleftrightarrow> x \<in> {Inl j, Inl (snext m j)}"
-    unfolding S.in_neighborhood_iff using assms by (cases x) (auto simp: adj_rl adj_rr)
-qed
+  by (neighborhood_eq nb: S.in_neighborhood_iff simps: adj_rl adj_rr assms[simplified])
 
 lemma N_l:
   assumes "i \<in> {1..m}"

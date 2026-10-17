@@ -25,6 +25,26 @@ definition ks_fv :: "nat \<Rightarrow> nat \<Rightarrow> nat" where
   "ks_fv m i = (if i = 1 \<or> m div 2 + 2 \<le> i then ks_r m + 1 - (ks_q m i + 2) div 3
      else if m mod 6 = 2 \<and> i = ks_pm m then 2 else ks_r m + 1 - (ks_q m i + 4) div 3)"
 
+text \<open>Identities used in the cases \<open>m \<equiv> 2, 5 (mod 6)\<close> of the claim below.\<close>
+
+lemma S4: "(m::nat) mod 6 = 2 \<Longrightarrow> m + 3 = 2 * ((m + 4) div 3) + (m + 2) div 3"
+  by (mod6_cases m)
+
+lemma S2: "(m::nat) mod 6 = 2 \<Longrightarrow> m + 1 = (m + 4) div 3 + (m + 1) div 3 + (m - 1) div 3"
+  by (mod6_cases m)
+
+lemma S3:
+  assumes c: "(m::nat) mod 6 = 5"
+  shows "m + 2 = (m + 4) div 3 + (m + 2) div 3 + (m + 3) div 3"
+proof -
+  define t where "t = m div 6"
+  have mt: "m = 6 * t + 5" using c div_mult_mod_eq[of m 6] unfolding t_def by linarith
+  have "m + 4 = 3 * (2 * t + 3)" "m + 2 = 3 * (2 * t + 2) + 1" "m + 3 = 3 * (2 * t + 2) + 2" using mt by simp_all
+  then have "(m + 4) div 3 = 2 * t + 3" "(m + 2) div 3 = 2 * t + 2" "(m + 3) div 3 = 2 * t + 2"
+    by (simp_all only: div_mod_lin)
+  then show ?thesis using mt by simp
+qed
+
 context
   fixes m :: nat
   assumes m3: "3 \<le> m"
@@ -211,57 +231,13 @@ proof -
 qed
 
 lemma ident_last: "2 * (k::nat) + 4 = (2 * k + 5) div 3 + (2 * k + 7) div 3 + (2 * k + 3) div 3"
-proof -
-  define t c where "t = k div 3" and "c = k mod 3"
-  have k: "k = 3 * t + c" and c: "c < 3" by (simp_all add: t_def c_def)
-  have "2 * k + 5 = (2 * c + 5) + 3 * (2 * t)" "2 * k + 7 = (2 * c + 7) + 3 * (2 * t)"
-    "2 * k + 3 = (2 * c + 3) + 3 * (2 * t)" using k by simp_all
-  then have A: "(2 * k + 5) div 3 = (2 * c + 5) div 3 + 2 * t"
-    and B: "(2 * k + 7) div 3 = (2 * c + 7) div 3 + 2 * t"
-    and C: "(2 * k + 3) div 3 = (2 * c + 3) div 3 + 2 * t" by (simp_all only: div3_lin)
-  consider "c = 0" | "c = 1" | "c = 2" using c by linarith
-  then show ?thesis by cases (simp only: A B C, simp add: k)+
-qed
+  by (mod3_cases k simps: distrib_left mult.assoc[symmetric])
 
 lemma div3_of: "(x::nat) = a + 3 * b \<Longrightarrow> x div 3 = a div 3 + b"
   by simp
 
 lemma m6: obtains t where "m = 6 * t + m mod 6"
   using div_mult_mod_eq[of m 6] by (metis mult.commute)
-
-lemma S4: "m mod 6 = 2 \<Longrightarrow> m + 3 = 2 * ((m + 4) div 3) + (m + 2) div 3"
-proof -
-  assume c: "m mod 6 = 2"
-  obtain t where "m = 6 * t + m mod 6" by (rule m6)
-  then have mt: "m = 6 * t + 2" using c by simp
-  have e: "m + 4 = 0 + 3 * (2 * t + 2)" "m + 2 = 1 + 3 * (2 * t + 1)" using mt by simp_all
-  have "(m + 4) div 3 = 2 * t + 2" "(m + 2) div 3 = 2 * t + 1" using div3_of[OF e(1)] div3_of[OF e(2)] by simp_all
-  then show ?thesis using mt by simp
-qed
-
-lemma S2: "m mod 6 = 2 \<Longrightarrow> m + 1 = (m + 4) div 3 + (m + 1) div 3 + (m - 1) div 3"
-proof -
-  assume c: "m mod 6 = 2"
-  obtain t where "m = 6 * t + m mod 6" by (rule m6)
-  then have mt: "m = 6 * t + 2" using c by simp
-  have e: "m + 4 = 0 + 3 * (2 * t + 2)" "m + 1 = 0 + 3 * (2 * t + 1)" "m - 1 = 1 + 3 * (2 * t)"
-    using mt by simp_all
-  have "(m + 4) div 3 = 2 * t + 2" "(m + 1) div 3 = 2 * t + 1" "(m - 1) div 3 = 2 * t"
-    using div3_of[OF e(1)] div3_of[OF e(2)] div3_of[OF e(3)] by simp_all
-  then show ?thesis using mt by simp
-qed
-
-lemma S3: "m mod 6 = 5 \<Longrightarrow> m + 2 = (m + 4) div 3 + (m + 2) div 3 + (m + 3) div 3"
-proof -
-  assume c: "m mod 6 = 5"
-  obtain t where "m = 6 * t + m mod 6" by (rule m6)
-  then have mt: "m = 6 * t + 5" using c by simp
-  have e: "m + 4 = 0 + 3 * (2 * t + 3)" "m + 2 = 1 + 3 * (2 * t + 2)" "m + 3 = 2 + 3 * (2 * t + 2)"
-    using mt by simp_all
-  have "(m + 4) div 3 = 2 * t + 3" "(m + 2) div 3 = 2 * t + 2" "(m + 3) div 3 = 2 * t + 2"
-    using div3_of[OF e(1)] div3_of[OF e(2)] div3_of[OF e(3)] by simp_all
-  then show ?thesis using mt by simp
-qed
 
 lemma S1:
   assumes "m mod 6 \<in> {0, 1, 3, 4}"
@@ -500,11 +476,7 @@ lemma m3': "3 \<le> m" by (rule m3)
 lemma Bs_N:
   assumes "i \<in> {1..m}"
   shows "Bs.neighborhood (Inl i) = Inl ` ({1..m} - {i})"
-proof (rule set_eqI)
-  fix x show "x \<in> Bs.neighborhood (Inl i) \<longleftrightarrow> x \<in> Inl ` ({1..m} - {i})"
-    unfolding Bs.in_neighborhood_iff Bs.vert_adj_edge unfolding ks_base_def using assms
-    by (cases x) (auto simp: all_edges_doubleton)
-qed
+  by (neighborhood_eq nb: Bs.in_neighborhood_iff Bs.vert_adj_edge simps: ks_base_def all_edges_doubleton assms[simplified])
 
 lemma Bs_sum:
   assumes "i \<in> {1..m}"
@@ -581,9 +553,8 @@ proof -
     qed
     have sv: "S.sumN ?f (Inr j) \<le> 2 * ?r" if j: "j \<in> {1..m}" for j
       using sumN_r[OF j, of ?fu ?fv] ks_fu_range[OF m3 j] ks_fu_range[OF m3 snext_in[OF j]] by simp
-    have "S.additive_coloring ?r ?f"
-      unfolding S.additive_coloring_def
-    proof (intro conjI allI impI)
+    have "S.eta \<le> ?r"
+    proof (eta_upper rule: S.eta_le_coloring)
       show "S.labeling ?r ?f"
         unfolding S.labeling_def unfolding sun_verts_def using ks_fu_range[OF m3] ks_fv_range[OF m3] by auto
     next
@@ -591,27 +562,21 @@ proof -
       have uv: "S.sumN ?f (Inr j) < S.sumN ?f (Inl i)" if i: "i \<in> {1..m}" and j: "j \<in> {1..m}" for i j
         using su[OF i] sv[OF j] ks_q_range[OF m3 i] FU by linarith
       show "S.sumN ?f x \<noteq> S.sumN ?f y"
-      proof (cases x; cases y)
-        fix i j assume xy': "x = Inl i" "y = Inl j"
-        then have ij: "i \<in> {1..m}" "j \<in> {1..m}" "i \<noteq> j" using xy adj_uu by simp_all
+      proof (sum_edge_cases adj: xy sym: S.vert_adj_sym rr: adj_rr)
+        fix i j assume ll: "S.vert_adj (Inl i) (Inl j)"
+        then have ij: "i \<in> {1..m}" "j \<in> {1..m}" "i \<noteq> j" using ll adj_uu by simp_all
         then have "ks_q m i \<noteq> ks_q m j" using ks_q_inj[OF m3] by blast
-        then show ?thesis using su[OF ij(1)] su[OF ij(2)] xy' by auto
+        then show "S.sumN ?f (Inl i) \<noteq> S.sumN ?f (Inl j)" using su[OF ij(1)] su[OF ij(2)] by auto
       next
-        fix i j assume xy': "x = Inl i" "y = Inr j"
-        then have "j \<in> {1..m}" "i = j \<or> i = snext m j" using xy adj_lr by simp_all
+        fix i j assume lr: "S.vert_adj (Inl i) (Inr j)"
+        then have "j \<in> {1..m}" "i = j \<or> i = snext m j" using lr adj_lr by simp_all
         then have "i \<in> {1..m}" "j \<in> {1..m}" using snext_in by auto
-        then show ?thesis using uv xy' by fastforce
-      next
-        fix i j assume xy': "x = Inr i" "y = Inl j"
-        then have "i \<in> {1..m}" "j = i \<or> j = snext m i" using xy adj_rl by simp_all
-        then have "j \<in> {1..m}" "i \<in> {1..m}" using snext_in by auto
-        then show ?thesis using uv xy' by fastforce
-      next
-        fix i j assume "x = Inr i" "y = Inr j"
-        then show ?thesis using xy adj_rr by simp
+        then show "S.sumN ?f (Inl i) \<noteq> S.sumN ?f (Inr j)" using uv by fastforce
       qed
+    next
+      show "0 < ?r" using r2 by simp
     qed
-    then show "S.eta \<le> cdiv (m + 2) 3" using r r2 by (intro S.eta_le) auto
+    then show "S.eta \<le> cdiv (m + 2) 3" using r r2 by auto
   qed
 qed
 

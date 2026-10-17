@@ -104,9 +104,8 @@ proof -
     proof (cases "q = 2")
       case True
       define f where "f = case_sum (\<lambda>i::nat. 1::nat) (\<lambda>i::nat. if i = 2 then 2 else 1)"
-      have "G.additive_coloring 2 f"
-        unfolding G.additive_coloring_def
-      proof (intro conjI allI impI)
+      have "G.eta \<le> 2"
+      proof (eta_upper rule: G.eta_le_coloring)
         show "G.labeling 2 f" by (auto simp: G.labeling_def f_def split: sum.split)
       next
         fix x y assume xy: "G.vert_adj x y"
@@ -117,24 +116,17 @@ proof -
         have Sr: "G.sumN f (Inr i) = 1" if "i \<in> {1..q}" for i
           using sum_r[of i "\<lambda>i. 1::nat"] that True by (simp add: f_def)
         show "G.sumN f x \<noteq> G.sumN f y"
-        proof (cases x; cases y)
-          fix i j assume "x = Inl i" "y = Inl j"
-          then have ij: "i \<in> {1..q}" "j \<in> {1..q}" "i \<noteq> j" using xy by (simp_all add: adj_ll)
-          then show ?thesis using \<open>x = Inl i\<close> \<open>y = Inl j\<close> Sl[OF ij(1)] Sl[OF ij(2)] q12[OF ij(1)] q12[OF ij(2)] ij(3) by auto
+        proof (sum_edge_cases adj: xy sym: G.vert_adj_sym rr: adj_rr)
+          fix i j assume ll: "G.vert_adj (Inl i) (Inl j)"
+          have ij: "i \<in> {1..q}" "j \<in> {1..q}" "i \<noteq> j" using ll by (simp_all add: adj_ll)
+          show "G.sumN f (Inl i) \<noteq> G.sumN f (Inl j)" using Sl[OF ij(1)] Sl[OF ij(2)] q12[OF ij(1)] q12[OF ij(2)] ij(3) by auto
         next
-          fix i j assume "x = Inl i" "y = Inr j"
-          then have "i \<in> {1..q}" "j \<in> {1..q}" using xy by (auto simp: adj_lr)
-          then show ?thesis using \<open>x = Inl i\<close> \<open>y = Inr j\<close> Sl Sr by auto
-        next
-          fix i j assume "x = Inr i" "y = Inl j"
-          then have "i \<in> {1..q}" "j \<in> {1..q}" using xy G.vert_adj_sym by (auto simp: adj_lr)
-          then show ?thesis using \<open>x = Inr i\<close> \<open>y = Inl j\<close> Sl Sr by auto
-        next
-          fix i j assume "x = Inr i" "y = Inr j"
-          then show ?thesis using xy adj_rr by simp
+          fix i j assume lr: "G.vert_adj (Inl i) (Inr j)"
+          have ij: "i \<in> {1..q}" "j \<in> {1..q}" using lr by (auto simp: adj_lr)
+          show "G.sumN f (Inl i) \<noteq> G.sumN f (Inr j)" using Sl[OF ij(1)] Sr[OF ij(2)] by auto
         qed
       qed
-      then show ?thesis using True r by (intro G.eta_le) auto
+      then show ?thesis using True r by auto
     next
       case False
       then have q3: "3 \<le> q" using assms(1) by simp
@@ -157,9 +149,8 @@ proof -
       let ?f = "case_sum fu fv"
       have su: "G.sumN ?f (Inl i) + ?r' = sum fu {1..q} + i" if "i \<in> {1..q}" for i
         using sum_l[OF that, of fu fv] key[OF that] by linarith
-      have "G.additive_coloring ?r' ?f"
-        unfolding G.additive_coloring_def
-      proof (intro conjI allI impI)
+      have "G.eta \<le> ?r'"
+      proof (eta_upper rule: G.eta_le_coloring)
         show "G.labeling ?r' ?f"
           unfolding G.labeling_def using lab_u lab_v by (auto simp: spider_verts_def)
       next
@@ -167,25 +158,17 @@ proof -
         have uv: "G.sumN ?f (Inr i) < G.sumN ?f (Inl i)" if "i \<in> {1..q}" for i
           using su[OF that] sum_r[OF that, of fu fv] lab_u[OF that] FU that by auto
         show "G.sumN ?f x \<noteq> G.sumN ?f y"
-        proof (cases x; cases y)
-          fix i j assume xy': "x = Inl i" "y = Inl j"
-          then have ij: "i \<in> {1..q}" "j \<in> {1..q}" "i \<noteq> j" using xy by (simp_all add: adj_ll)
-          then show ?thesis using su[OF ij(1)] su[OF ij(2)] xy' by auto
+        proof (sum_edge_cases adj: xy sym: G.vert_adj_sym rr: adj_rr)
+          fix i j assume ll: "G.vert_adj (Inl i) (Inl j)"
+          have ij: "i \<in> {1..q}" "j \<in> {1..q}" "i \<noteq> j" using ll by (simp_all add: adj_ll)
+          show "G.sumN ?f (Inl i) \<noteq> G.sumN ?f (Inl j)" using su[OF ij(1)] su[OF ij(2)] ij(3) by auto
         next
-          fix i j assume xy': "x = Inl i" "y = Inr j"
-          then have ij: "i \<in> {1..q}" "j = i" using xy by (simp_all add: adj_lr)
-          then show ?thesis using uv[OF ij(1)] xy' by auto
-        next
-          fix i j assume xy': "x = Inr i" "y = Inl j"
-          then have "G.vert_adj (Inl j) (Inr i)" using xy G.vert_adj_sym by blast
-          then have ij: "j \<in> {1..q}" "i = j" by (simp_all add: adj_lr)
-          then show ?thesis using uv[OF ij(1)] xy' by auto
-        next
-          fix i j assume "x = Inr i" "y = Inr j"
-          then show ?thesis using xy adj_rr by simp
+          fix i j assume lr: "G.vert_adj (Inl i) (Inr j)"
+          have ij: "i \<in> {1..q}" "j = i" using lr by (simp_all add: adj_lr)
+          show "G.sumN ?f (Inl i) \<noteq> G.sumN ?f (Inr j)" using uv[OF ij(1)] ij(2) by auto
         qed
       qed
-      then show ?thesis using r r2 by (intro G.eta_le) auto
+      then show ?thesis using r r2 by auto
     qed
   qed
 qed
@@ -281,9 +264,8 @@ proof -
   proof (cases "q = 2")
     case True
     define f where "f = case_sum (\<lambda>i::nat. 1::nat) (\<lambda>i::nat. if i = 1 then 2 else 1)"
-    have "G.additive_coloring 2 f"
-      unfolding G.additive_coloring_def
-    proof (intro conjI allI impI)
+    have "G.eta \<le> 2"
+    proof (eta_upper rule: G.eta_le_coloring)
       show "G.labeling 2 f" by (auto simp: G.labeling_def f_def split: sum.split)
     next
       fix x y assume xy: "G.vert_adj x y"
@@ -295,24 +277,17 @@ proof -
         using sum_r[of i "\<lambda>i. 1::nat" "\<lambda>i. if i = 1 then 2 else 1"] that True
         by (auto simp: f_def eval_nat_numeral atLeastAtMostSuc_conv)
       show "G.sumN f x \<noteq> G.sumN f y"
-      proof (cases x; cases y)
-        fix i j assume "x = Inl i" "y = Inl j"
-        then have ij: "i \<in> {1..q}" "j \<in> {1..q}" "i \<noteq> j" using xy by (simp_all add: adj_ll)
-        then show ?thesis using \<open>x = Inl i\<close> \<open>y = Inl j\<close> Sl[OF ij(1)] Sl[OF ij(2)] q12[OF ij(1)] q12[OF ij(2)] ij(3) by auto
+      proof (sum_edge_cases adj: xy sym: G.vert_adj_sym rr: adj_rr)
+        fix i j assume ll: "G.vert_adj (Inl i) (Inl j)"
+        have ij: "i \<in> {1..q}" "j \<in> {1..q}" "i \<noteq> j" using ll by (simp_all add: adj_ll)
+        show "G.sumN f (Inl i) \<noteq> G.sumN f (Inl j)" using Sl[OF ij(1)] Sl[OF ij(2)] q12[OF ij(1)] q12[OF ij(2)] ij(3) by auto
       next
-        fix i j assume "x = Inl i" "y = Inr j"
-        then have "i \<in> {1..q}" "j \<in> {1..q}" using xy by (auto simp: adj_lr)
-        then show ?thesis using \<open>x = Inl i\<close> \<open>y = Inr j\<close> Sl Sr by auto
-      next
-        fix i j assume "x = Inr i" "y = Inl j"
-        then have "i \<in> {1..q}" "j \<in> {1..q}" using xy G.vert_adj_sym by (auto simp: adj_lr)
-        then show ?thesis using \<open>x = Inr i\<close> \<open>y = Inl j\<close> Sl Sr by auto
-      next
-        fix i j assume "x = Inr i" "y = Inr j"
-        then show ?thesis using xy adj_rr by simp
+        fix i j assume lr: "G.vert_adj (Inl i) (Inr j)"
+        have ij: "i \<in> {1..q}" "j \<in> {1..q}" using lr by (auto simp: adj_lr)
+        show "G.sumN f (Inl i) \<noteq> G.sumN f (Inr j)" using Sl[OF ij(1)] Sr[OF ij(2)] by auto
       qed
     qed
-    then show ?thesis using True by (intro G.eta_le) auto
+    then show ?thesis using True by auto
   next
     case False
     then have q3: "3 \<le> q" using assms by simp
@@ -336,34 +311,25 @@ proof -
       using sum_l[OF that, of fu fv] key[of i] by linarith
     have sv: "G.sumN ?f (Inr j) + fu j = sum fu {1..q}" if "j \<in> {1..q}" for j
       using sum_r[OF that] .
-    have "G.additive_coloring ?r ?f"
-      unfolding G.additive_coloring_def
-    proof (intro conjI allI impI)
+    have "G.eta \<le> ?r"
+    proof (eta_upper rule: G.eta_le_coloring)
       show "G.labeling ?r ?f" unfolding G.labeling_def using lab_u lab_v by (auto simp: spider_verts_def)
     next
       fix x y assume xy: "G.vert_adj x y"
       have uv: "G.sumN ?f (Inr j) < G.sumN ?f (Inl i)" if "i \<in> {1..q}" "j \<in> {1..q}" for i j
         using su[OF that(1)] sv[OF that(2)] lab_u[OF that(2)] FV that(1) by auto
       show "G.sumN ?f x \<noteq> G.sumN ?f y"
-      proof (cases x; cases y)
-        fix i j assume xy': "x = Inl i" "y = Inl j"
-        then have ij: "i \<in> {1..q}" "j \<in> {1..q}" "i \<noteq> j" using xy by (simp_all add: adj_ll)
-        then show ?thesis using su[OF ij(1)] su[OF ij(2)] xy' by auto
+      proof (sum_edge_cases adj: xy sym: G.vert_adj_sym rr: adj_rr)
+        fix i j assume ll: "G.vert_adj (Inl i) (Inl j)"
+        have ij: "i \<in> {1..q}" "j \<in> {1..q}" "i \<noteq> j" using ll by (simp_all add: adj_ll)
+        show "G.sumN ?f (Inl i) \<noteq> G.sumN ?f (Inl j)" using su[OF ij(1)] su[OF ij(2)] ij(3) by auto
       next
-        fix i j assume xy': "x = Inl i" "y = Inr j"
-        then have ij: "i \<in> {1..q}" "j \<in> {1..q}" using xy by (simp_all add: adj_lr)
-        then show ?thesis using uv[OF ij(1) ij(2)] xy' by auto
-      next
-        fix i j assume xy': "x = Inr i" "y = Inl j"
-        then have "G.vert_adj (Inl j) (Inr i)" using xy G.vert_adj_sym by blast
-        then have ij: "j \<in> {1..q}" "i \<in> {1..q}" by (simp_all add: adj_lr)
-        then show ?thesis using uv[OF ij(1) ij(2)] xy' by auto
-      next
-        fix i j assume "x = Inr i" "y = Inr j"
-        then show ?thesis using xy adj_rr by simp
+        fix i j assume lr: "G.vert_adj (Inl i) (Inr j)"
+        have ij: "i \<in> {1..q}" "j \<in> {1..q}" using lr by (simp_all add: adj_lr)
+        show "G.sumN ?f (Inl i) \<noteq> G.sumN ?f (Inr j)" using uv[OF ij(1) ij(2)] by auto
       qed
     qed
-    then show ?thesis using q3 by (intro G.eta_le) auto
+    then show ?thesis using q3 by auto
   qed
   ultimately show ?thesis using r by simp
 qed
