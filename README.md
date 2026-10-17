@@ -14,12 +14,11 @@ It contains:
 | File or folder | Content |
 |---|---|
 | `severin-additive-chromatic-number.pdf` | arXiv version (v3, 12 Feb 2020): the paper plus the appendix with the proofs of the propositions (ref. [7]); download it from [arXiv](https://arxiv.org/abs/1602.07675) |
-| `IPL105937_editorproof.pdf` | the publisher's proof of the IPL version (without the appendix) |
-
-The PDF files are not part of the repository (see [License](#license)).
 | [`references/`](references/README.md) | summaries of the papers cited by the paper |
 | [`others/`](others/README.md) | summaries of further papers on additive colorings and their techniques (Combinatorial Nullstellensatz, discharging, list and closed variants) |
 | [`isabelle/`](isabelle/README.md) | the formalization |
+
+The PDF file is not part of the repository (see [License](#license)).
 
 ---
 
