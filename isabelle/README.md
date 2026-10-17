@@ -77,8 +77,7 @@ appendix of the arXiv version. See the main [README](../README.md) for the state
 Everything is proved: there is no `sorry`, and the session builds without `quick_and_dirty`.
 
 **What is assumed.** The two results of Marenco, Mydlarz and Severín (ref. [6]) that the paper
-cites are assumed, not proved, as locale assumptions about a given graph (as in the UPRF
-formalization for J. Robinson's theorem). No axiom is added.
+cites are assumed, not proved, as locale assumptions about a given graph. No axiom is added.
 - `MMS15_lemma2` (Lemma 2 = [6], Prop. 3): for a complete multipartite graph, an acyclic
   orientation has η_t < ∞ iff it is monotone for some ordering of the parts, and in that case
   η_t = max ⌈s_i/|V_i|⌉. It is used by Theorem 1.
