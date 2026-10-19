@@ -1,5 +1,7 @@
 # Papers (copyrighted; only the bibliographic data is in the READMEs)
 *.pdf
+# except the generated FM-style paper of the Mizar article
+!mizar/acn.pdf
 
 # OS files
 .DS_Store
@@ -8,3 +10,13 @@
 # only the list of entries is kept
 isabelle/afp/*
 !isabelle/afp/ROOTS
+
+# Mizar: local installation, library files and verifier outputs
+mizar/system/
+mizar/prel/
+mizar/text/*
+!mizar/text/*.miz
+mizar/fm/body.tex
+mizar/fm/refs.tex
+mizar/fm/acn.build.log
+mizar/fm/__pycache__/

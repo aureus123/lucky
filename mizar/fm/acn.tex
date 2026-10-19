@@ -1,0 +1,196 @@
+\documentclass[10pt]{article}
+\usepackage[paperwidth=170mm,paperheight=240mm,top=22mm,bottom=22mm,
+  inner=20mm,outer=20mm,headsep=6mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+
+\hyphenation{multi-par-ti-tion}
+
+\usepackage{tikz}
+
+% ------------------------------------------------------------ FM-like layout
+\newif\iffmlabels \fmlabelsfalse  % \fmlabelstrue shows the Mizar labels
+\newcounter{fmsec}
+% keep a heading with the text that follows it
+\newcommand{\fmkeep}{\par\vskip 0pt plus 8\baselineskip\penalty-200
+  \vskip 0pt plus -8\baselineskip}
+\newcommand{\fmsection}[1]{\stepcounter{fmsec}%
+  \fmkeep\bigskip\begin{center}\normalsize\scshape\arabic{fmsec}.\ #1\end{center}\nopagebreak
+  \smallskip}
+\newcommand{\fmunnumbered}[1]{%
+  \fmkeep\bigskip\begin{center}\normalsize\scshape #1\end{center}\nopagebreak\smallskip}
+\newcommand{\fmpara}[1]{\par\smallskip #1\par}
+\newlength{\fmnum}\setlength{\fmnum}{2.6em}
+\newlength{\fmdefnum}\setlength{\fmdefnum}{4.6em}
+\makeatletter
+% (n) statement (and, optionally, the Mizar label at the right)
+\newcommand{\fmthm}[3]{\par\smallskip\noindent
+  \hangindent=\dimexpr\fmnum+1.2em\relax\hangafter=1%
+  \hspace*{1.2em}\makebox[\fmnum][l]{(#1)}#2%
+  \iffmlabels\nobreak\hfill\nobreak
+    \hbox{\hspace{1em}\scriptsize\textsf{\color{black!60}#3}}\fi
+  \phantomsection\def\@currentlabel{#1}\label{thm:#3}\par}
+\makeatother
+\newcommand{\fmdef}[2]{\par\smallskip\noindent
+  \hangindent=\fmdefnum\hangafter=1%
+  \makebox[\fmdefnum][l]{(Def.\,#1)}#2\par}
+\newcounter{fmi}
+\newif\iffmsameline
+% \fmsameline: the first item goes on the line of the theorem number
+\newcommand{\fmsameline}{\global\fmsamelinetrue}
+\newenvironment{fmlist}{\setcounter{fmi}{0}%
+  \renewcommand{\item}{\stepcounter{fmi}%
+    \iffmsameline\global\fmsamelinefalse\else
+      \par\noindent\hspace*{\dimexpr\fmnum+1.2em\relax}\fi
+    \hangindent=\dimexpr\fmnum+1.2em+2.8em\relax\hangafter=1%
+    \makebox[2.8em][r]{(\roman{fmi})\ }}%
+  \iffmsameline\else\par\fi}{\par}
+% the period that ends a statement goes into its last item
+\def\fmlistend#1{#1\end{fmlist}}
+% text after a list, aligned with the statement
+\newcommand{\fmafterlist}[1]{\par\noindent
+  \hangindent=\dimexpr\fmnum+1.2em\relax\hangafter=0 #1}
+\newcommand{\thref}[1]{(\ref{thm:#1})}
+% the ORCID iD icon
+\newcommand{\orcidicon}{\tikz[baseline=-0.6ex]{
+  \fill[green!55!black!80!lime] (0,0) circle (0.9ex);
+  \node[white,font=\fontsize{4.5}{4.5}\selectfont\sffamily\bfseries,inner sep=0]
+    at (0,0) {iD};}}
+\newcommand{\fmbox}[1]{\fcolorbox{cyan!70}{white}{\strut #1}}
+\setlength{\fboxsep}{1.5pt}\setlength{\fboxrule}{0.4pt}
+\setlength{\parindent}{1.5em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\thepage}
+\fancyhead[RO]{\small\thepage}
+\fancyhead[CE]{\small\scshape daniel severín}
+\fancyhead[CO]{\small\scshape Additive chromatic number of several families of graphs}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{first}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}
+  \fancyfoot[C]{\small\thepage}}
+
+\begin{document}
+\thispagestyle{first}
+
+\noindent{\scriptsize\scshape A Mizar article in the style of
+Formalized Mathematics}
+\vspace{16mm}
+
+\begin{center}
+{\LARGE\bfseries On the Additive Chromatic Number of\\[2pt] Several Families of Graphs}
+\par\vspace{12mm}
+{\large Daniel Severín\,\href{https://orcid.org/0000-0003-2391-3489}{\orcidicon}\\
+Facultad de Ciencias Exactas, Ingeniería y Agrimensura\\
+Universidad Nacional de Rosario\\
+Argentina}\\[3pt]
+{\small\href{mailto:daniel@fceia.unr.edu.ar}{\texttt{daniel@fceia.unr.edu.ar}}}
+\end{center}
+
+\vspace{10mm}
+\begin{list}{}{\leftmargin=8mm\rightmargin=8mm}\item\relax
+{\small
+\textbf{\normalsize Summary.} Given a graph $G$, a labeling $f$ of its vertices
+with natural numbers is an additive coloring of $G$ if the sums $f(N(u))$ and
+$f(N(v))$ of the labels in the open neighborhoods of $u$ and $v$ differ for
+every edge $uv$ of $G$. The additive chromatic number $\eta(G)$ is the least
+$k$ such that $G$ has an additive coloring with labels in $\{1,\ldots,k\}$
+\cite{czerwinski}. We formalize Sections 1--5 of \cite{severin}, including the
+proofs of its propositions that are given in the appendix of its arXiv
+version: $\eta(G)$ of regular bipartite, complete multipartite and complete
+split graphs, of joins with complete graphs, fans, windmills, wheels, odd
+cycles, headless spiders and three families of suns, and the Additive
+Coloring Conjecture $\eta(G) \leq \chi(G)$ for complete multipartite graphs,
+for joins with complete graphs and for split graphs. The two results that
+the paper cites from \cite{marenco} (the value of the topological additive
+number of complete multipartite digraphs and a lower bound from cliques), and
+the equality $\eta(G) = \min \eta_t(D)$ over the acyclic orientations $D$ of
+$G$, are proved as well.
+
+\par\medskip
+MSC: \href{https://zbmath.org/classification/?q=05C15}{\fmbox{05C15}}\enspace
+\href{https://zbmath.org/classification/?q=05C78}{\fmbox{05C78}}\enspace
+\href{https://zbmath.org/classification/?q=68V20}{\fmbox{68V20}}
+
+\smallskip
+Keywords: additive coloring;\enspace lucky labeling;\enspace additive
+chromatic number;\enspace split graph;\enspace complete multipartite graph
+
+\smallskip
+MML identifier: \fmbox{\texttt{ACN}},\enspace version:
+\fmbox{\texttt{8.1.15 5.94.1493}}
+}
+\end{list}
+\vspace{4mm}
+
+\fmunnumbered{Introduction}
+
+The Additive Coloring Problem asks for a labeling $f : V(G) \to
+\{1,\ldots,k\}$ such that $f(N(u)) \neq f(N(v))$ for every edge $uv$, with
+$k$ as small as possible; the least such $k$ is the additive chromatic number
+(or lucky number) $\eta(G)$ \cite{czerwinski}. The Additive Coloring
+Conjecture states that $\eta(G) \leq \chi(G)$ for every graph $G$. This
+article formalizes the paper \cite{severin} in the Mizar system
+\cite{mizar,fourdecades}. The proofs follow an earlier formalization of the
+same paper in Isabelle/HOL.
+
+Graphs are finite simple graphs given as non empty, finite, irreflexive and
+symmetric relational structures \cite{necklace}; $\Omega_G$ is the set of
+vertices of $G$ and $E_G$ its (symmetric) adjacency relation. The chromatic
+number $\chi(G)$ is the least number of classes of a partition of $\Omega_G$
+into stable sets, as defined in \cite{mycielsk,dilworth}. Sums of labels
+over finite sets are sums of bags \cite{uproots,nat5}. The additive chromatic
+number is introduced in Section~2, together with acyclic orientations
+(based on the reduction sequences of \cite{rewrite1}), topological additive
+numberings, the topological additive number $\eta_t(D)$ of \cite{marenco}
+(an extended real, $+\infty$ when there is no numbering) and the equality
+$\eta(G) = \min \eta_t(D)$ \thref{EtaMinEtaT}.
+
+Each family of graphs of \cite{severin} is introduced as a predicate on
+graphs, with a theorem stating that such graphs exist. The results of the
+paper correspond to the following theorems: Observation~1
+\thref{Observation1}, Lemma~1 \thref{Lemma1}, Corollary~1
+\thref{Corollary1}, Lemma~2 \thref{Lemma2Value}, \thref{Lemma2Finite},
+Theorem~1 \thref{Theorem1}, \thref{Theorem1Conjecture}, Observation~2
+\thref{Observation2}, Theorem~2 \thref{Theorem2},
+\thref{Theorem2Conjecture}, fans \thref{Fan}, windmills \thref{Windmill},
+Proposition~1 \thref{Proposition1}, wheels \thref{Wheel}, Theorem~3
+\thref{Theorem3}, \thref{Theorem3Conjecture}, \thref{SplitConjecture},
+Proposition~2 \thref{Proposition2}, Lemma~3 \thref{Lemma3}, Corollary~2
+\thref{Corollary2}, Proposition~3 \thref{Proposition3Thin},
+\thref{Proposition3Thick}, Proposition~4 \thref{Proposition4} and
+Proposition~5 \thref{Proposition5Cycle}, \thref{Proposition5Wheel}. The
+labeling of complete suns is the one of the appendix of \cite{severin}, with
+one correction: in the case $m \equiv 2 \pmod 6$, $i = \lfloor m/2\rfloor +
+1$, the label of $v_{i-1}$ is $2$.
+
+Throughout, $N(v)$ is the open neighborhood of $v$, $\deg v$ its degree,
+$f(N(v))$ the sum of the labels in $N(v)$, $\overline{\overline{X}}$ the
+cardinality of $X$, $\lceil a/b\rceil$ the ceiling of $a/b$, and
+$\mathrm{succ}_m(i)$, $\mathrm{pred}_m(i)$ the successor and the predecessor
+of $i$ modulo $m$ in $\{1,\ldots,m\}$. In the families on two sides
+(spiders and suns), $u_i = \langle 0, i\rangle$ and $v_i = \langle 1,
+i\rangle$.
+
+\input{body}
+
+\bigskip
+\noindent\textsc{Acknowledgement:} This document has the layout of a paper in
+\emph{Formalized Mathematics}. It is generated by \texttt{miz2tex.py} from the
+Mizar article \texttt{acn.miz} and has not been published.
+
+\makeatletter
+{\footnotesize
+\fmunnumbered{References}
+\let\section\@gobbletwo
+\setlength{\itemsep}{0pt}
+\input{refs}
+}
+\makeatother
+
+\end{document}

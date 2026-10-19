@@ -9,14 +9,15 @@ It contains:
 - the paper's results;
 - remarks on hypotheses that the paper leaves implicit, and small slips found while preparing the
   formalization;
-- a machine-checked formalization of Sections 1–5 in Isabelle/HOL.
+- machine-checked formalizations of Sections 1–5 in Isabelle/HOL and in Mizar.
 
 | File or folder | Content |
 |---|---|
 | `severin-additive-chromatic-number.pdf` | arXiv version (v3, 12 Feb 2020): the paper plus the appendix with the proofs of the propositions (ref. [7]); download it from [arXiv](https://arxiv.org/abs/1602.07675) |
 | [`references/`](references/README.md) | summaries of the papers cited by the paper |
 | [`others/`](others/README.md) | summaries of further papers on additive colorings and their techniques (Combinatorial Nullstellensatz, discharging, list and closed variants) |
-| [`isabelle/`](isabelle/README.md) | the formalization |
+| [`isabelle/`](isabelle/README.md) | the formalization in Isabelle/HOL |
+| [`mizar/`](mizar/README.md) | the formalization in Mizar |
 
 The PDF file is not part of the repository (see [License](#license)).
 
@@ -162,7 +163,7 @@ Found while preparing and writing the formalization. None affects a result.
   - The paper writes $`r = m/3 + 1`$ (not an integer here) and $`f(v_{i-1}) = 1`$.
   - In fact $`r = (m+4)/3`$, so $`f(v_{i-1}) = r + 1 - \lceil m/3 \rceil = 2`$, and
     $`f(v_i) = 2 = 3r - m - f(v_{i-1})`$.
-  - The claimed recurrence still holds; it was checked for all $`m < 400`$ and proved in Isabelle.
+  - The claimed recurrence still holds; it was checked for all $`m < 400`$ and proved in Isabelle and in Mizar.
 
 - **Brute-force check.** The exact formulas were checked against $`\eta`$ computed by brute force:
   - $`C_5, C_7, C_9`$;
@@ -201,10 +202,14 @@ Found while preparing and writing the formalization. None affects a result.
 
 ---
 
-## 3. The formalization
+## 3. The formalizations
 
-Sections 1–5, with the proofs of Propositions 1–5 from the appendix, are formalized in
-**Isabelle/HOL** (Isabelle2025-2). See [`isabelle/README.md`](isabelle/README.md).
+Sections 1–5, with the proofs of Propositions 1–5 from the appendix, are formalized twice:
+in **Isabelle/HOL** (Isabelle2025-2) and in **Mizar** (8.1.15, MML 5.94.1493).
+
+### Isabelle/HOL
+
+See [`isabelle/README.md`](isabelle/README.md).
 
 - **Libraries.** It builds on two AFP entries: the graph library *Undirected Graph Theory*
   (C. Edmonds) and *Girth Chromatic* (L. Noschinski). The chromatic number is proved equal to
@@ -224,6 +229,27 @@ Sections 1–5, with the proofs of Propositions 1–5 from the appendix, are for
   - `fan`, `windmill`, `wheel`;
   - the conjecture for complete multipartite graphs, joins and split graphs:
     `theorem_1_conjecture`, `theorem_2_conjecture`, `split_graph_conjecture`.
+
+### Mizar
+
+See [`mizar/README.md`](mizar/README.md).
+
+- **Libraries.** Graphs are finite irreflexive symmetric `RelStr`s, and χ(G) is `chromatic#` of
+  the MML article MYCIELSK. Sums of labels are the bag sums of NAT_5.
+- **Status.** A single article, `mizar/text/acn.miz` (about 11000 lines, 200 theorems), with no
+  unproved steps. It verifies in about 55 s.
+- **No assumptions.** As in Isabelle, Lemmas 2 and 3 of ref. [6], η(G) = min η_t(D),
+  η(P_N) = 2, χ(G ∨ K_q) ≥ χ(G) + q and the existence of additive colorings are proved. Each
+  family of graphs comes with an existence theorem.
+- **Requirements and installation.** The [Mizar system](https://mizar.uwb.edu.pl/system/) 8.1.15
+  with MML 5.94.1493, Python 3. Set `MIZFILES` and the `PATH` (a local copy can go in
+  `mizar/system/`, which git ignores) and run `mizar/miz.sh acn`.
+- **Main theorems.**
+  - `Theorem1`, `Theorem2`, `Theorem3`, `Proposition1` … `Proposition5Wheel`;
+  - `Lemma2Value`, `Lemma2Finite`, `Lemma3`, `Corollary2`, `EtaMinEtaT`;
+  - `Fan`, `Windmill`, `Wheel`;
+  - the conjecture for complete multipartite graphs, joins and split graphs:
+    `Theorem1Conjecture`, `Theorem2Conjecture`, `SplitConjecture`.
 
 ---
 
