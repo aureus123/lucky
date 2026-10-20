@@ -70,7 +70,11 @@ def items(path):
             stmt = [m.group(2)]
             refs = []
             i += 1
-            while True:
+            first = strip_comment(m.group(2)).strip()
+            if first.endswith(';'):           # theorem X: ... by ...;
+                refs = cited(first)
+                stmt = [re.split(r'\bby\b', first)[0].rstrip(';')]
+            while not first.endswith(';'):
                 l = strip_comment(lines[i]).strip()
                 if l == 'proof' or l.startswith('proof'):
                     j = skip_block(i)
