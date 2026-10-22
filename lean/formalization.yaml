@@ -1,0 +1,222 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+# Metadata in the formalization.yaml standard (https://github.com/mathlib-initiative/formalization.yaml),
+# in the shape expected by the Palomar Registry (https://palomar-registry.org/how-to-submit).
+# It describes the Lean 4 formalization in this folder; the Isabelle/HOL and Mizar formalizations
+# of the repository are listed under related_formalizations.
+version: "v0.4"
+
+project:
+  name: "On the additive chromatic number of several families of graphs (Lean 4)"
+  description: >-
+    Lean 4 + Mathlib formalization of Sections 1-5 of D. Severín, "On the additive chromatic
+    number of several families of graphs" (Inf. Process. Lett. 158, 2020), with the proofs of
+    Propositions 1-5 from the appendix of the arXiv version. The additive chromatic number η(G)
+    is the least k with a labeling f : V → [k] such that the sums f(N(u)) and f(N(v)) differ
+    for every edge uv. It proves η(G) = min η_t(D) over acyclic orientations; Observation 1,
+    Lemma 1 and Corollary 1 (bipartite graphs); Lemma 2 and Theorem 1, the value of η for
+    complete multipartite graphs; Observation 2 and Theorem 2, η(G ∨ K_q) = max {η(G), q};
+    fans, windmills, wheels and odd cycles (Proposition 1); Theorem 3 and Proposition 2 (split
+    graphs); Lemma 3 and Corollary 2 (a lower bound from cliques); headless spiders
+    (Proposition 3), complete suns (Proposition 4), and cycle and wheel suns (Proposition 5).
+    It also proves the Additive Coloring Conjecture η(G) ≤ χ(G) for complete multipartite
+    graphs, for joins G ∨ K_q of graphs that satisfy it, and for split graphs.
+  authors:
+    - name: "Daniel E. Severín"
+      orcid: "0000-0003-2391-3489"
+  license: "MIT"
+  responsible_maintainers:
+    - name: "Daniel E. Severín"
+      orcid: "0000-0003-2391-3489"
+
+classification:
+  arxiv: ["math.CO", "cs.DM"]
+  msc2020: ["05C15", "05C78", "68V20"]
+
+sources:
+  - title: "On the additive chromatic number of several families of graphs"
+    authors:
+      - name: "Daniel E. Severín"
+        orcid: "0000-0003-2391-3489"
+    id: "doi:10.1016/j.ipl.2020.105937"
+    type: "article"
+    location: >-
+      Inf. Process. Lett. 158 (2020) 105937 (arXiv:1602.07675, whose appendix contains the
+      proofs of Propositions 1-5); Sections 1-5 and Appendix A
+    relationship: "formalizes"
+    note: >-
+      Sections 1-5 and the proofs of Propositions 1-5 are formalized. The lower bound of
+      Theorem 1 is proved by a different argument, because a step of the paper's proof is
+      false (see fidelity); the theorem itself is correct.
+    author_endorsement: "participated"
+  - title: "Topological additive numbering of directed acyclic graphs"
+    authors:
+      - "Javier Marenco"
+      - "Marcelo Mydlarz"
+      - name: "Daniel E. Severín"
+        orcid: "0000-0003-2391-3489"
+    id: "doi:10.1016/j.ipl.2014.09.011"
+    type: "article"
+    location: "Inf. Process. Lett. 115 (2015) 199-202; Propositions 1 and 3"
+    relationship: "formalizes"
+    note: >-
+      The paper cites Proposition 3 as its Lemma 2 and Proposition 1 as its Lemma 3; both are
+      proved here, following this article.
+    author_endorsement: "participated"
+  - title: "Lucky labelings of graphs"
+    authors:
+      - "Sebastian Czerwiński"
+      - "Jarosław Grytczuk"
+      - "Wiktor Żelazny"
+    id: "doi:10.1016/j.ipl.2009.05.011"
+    type: "article"
+    location: "Inf. Process. Lett. 109 (2009) 1078-1081"
+    relationship: "background"
+    note: >-
+      Defines the additive chromatic number and states the Additive Coloring Conjecture
+      η(G) ≤ χ(G). Its bound for trees, which the paper uses for paths, is not used: η(P_N) = 2
+      is proved with an explicit labeling.
+    author_endorsement: "n/a"
+
+related_formalizations:
+  - id: "https://github.com/aureus123/lucky/tree/main/isabelle"
+    relationship: "independent"
+    note: "Isabelle/HOL formalization of the same results in this repository."
+  - id: "https://github.com/aureus123/lucky/tree/main/mizar"
+    relationship: "independent"
+    note: "Mizar formalization of the same results in this repository."
+
+status:
+  scope: >-
+    A formalization of Sections 1-5 of the paper, with the proofs of Propositions 1-5 from the
+    appendix of the arXiv version, and of the two results of ref. [6] that the paper cites
+    (Lemmas 2 and 3). Every result is unconditional; the facts that the paper takes from the
+    literature or uses without proof are also proved: η(G) = min η_t(D), η(P_N) = 2, η(K_n) = n,
+    χ(G ∨ K_q) ≥ χ(G) + q, and the existence of an additive coloring of every graph. Not
+    formalized: Section 6 and Appendix B (the integer programming model, the computational
+    experiments on graphs with up to 10 vertices, and closed additive colorings).
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: []
+  main_results:
+    - declaration: "SimpleGraph.theorem_1"
+      file: "ACN/Sec2.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "SimpleGraph.theorem_2"
+      file: "ACN/Sec3.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "SimpleGraph.IsSplitWith.theorem_3"
+      file: "ACN/Sec4.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "SimpleGraph.proposition_4"
+      file: "ACN/Sec4Sun.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "SimpleGraph.split_graph_conjecture"
+      file: "ACN/Sec4.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+    - declaration: "SimpleGraph.eta_eq_iInf_etaT"
+      file: "ACN/Basics.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["Claude Opus 5.5"]
+      framework: "Claude Code"
+      tool_setup: >-
+        Claude Code agent working in the local repository, building with lake and the pinned
+        Mathlib, porting the existing Isabelle/HOL formalization of the same results under the
+        author's direction. The arithmetic of the labelings is decided by the project's tactics
+        split_omega and mod_split (built on omega); the rest uses Mathlib's simp, omega and
+        Finset lemmas.
+      cost:
+        wall_time: "one working session (2026-10-22)"
+        spend_usd: "not tracked"
+        hardware: "API-only models; builds on a local Mac"
+      prompting_notes: "n/a"
+  spend_usd: "not tracked"
+  notes: >-
+    The Lean development was written by Claude Code under the direction of the paper's author,
+    following the Isabelle/HOL formalization of the same results (also written by Claude Code
+    under the author's direction). The statements were stated anew over Mathlib's SimpleGraph.
+
+fidelity:
+  divergences: >-
+    Graphs are Mathlib SimpleGraphs on finite types, and χ(G) is Mathlib's chromaticNumber. The
+    families are concrete graphs (paths and cycles are Mathlib's pathGraph and cycleGraph), so
+    each proposition is stated for a specific graph; the paper states them up to isomorphism.
+    In the proof of Theorem 1, the step "i ≥ j" is false (e.g. part sizes (3, 1) ordered as
+    (1, 3)), and so is the inequality s'_j ≥ s_i that it is used for. The lower bound is proved
+    by a different argument (mpBound_sorted_le); η(G) ≤ r is proved from the closed form of s_i.
+    Theorem 3 is stated without the hypothesis T ≠ ∅, which the proof does not need. In the
+    appendix's proof of Proposition 4, case m ≡ 2 (mod 6), i = ⌊m/2⌋ + 1, the paper writes
+    r = m/3 + 1 and f(v_{i-1}) = 1; in fact r = (m + 4)/3 and f(v_{i-1}) = 2, and the claimed
+    recurrence still holds (ks_claim). The lower bound of Proposition 1 obtains the paper's
+    "oriented path of 3 consecutive vertices" by a parity argument.
+
+review:
+  status: "unchecked"
+  reviewers: []
+  notes: >-
+    The development builds without sorry and its main theorems depend only on propext,
+    Classical.choice and Quot.sound. The statements follow the Isabelle/HOL formalization of the
+    same results. No statement-by-statement audit against the paper has been done yet.
+
+alignment:
+  namespace: "SimpleGraph"
+  statements:
+    - source: "Section 1: η(G) = min η_t(D) over acyclic orientations"
+      lean: "SimpleGraph.eta_eq_iInf_etaT"
+      module: "ACN.Basics"
+      status: "proved"
+    - source: "Observation 1, Lemma 1, Corollary 1"
+      lean: "SimpleGraph.observation_1, SimpleGraph.lemma_1, SimpleGraph.corollary_1"
+      module: "ACN.Sec2"
+      status: "proved"
+    - source: "Lemma 2 (ref. [6], Prop. 3)"
+      lean: "SimpleGraph.lemma_2_value, SimpleGraph.lemma_2_finite_iff"
+      module: "ACN.Sec2"
+      status: "proved"
+    - source: "Theorem 1 and the conjecture for complete multipartite graphs"
+      lean: "SimpleGraph.theorem_1, SimpleGraph.theorem_1_conjecture"
+      module: "ACN.Sec2"
+      status: "proved"
+      note: "The lower bound uses a corrected argument (mpBound_sorted_le)."
+    - source: "Observation 2, Theorem 2 and the conjecture for G ∨ K_q"
+      lean: "SimpleGraph.observation_2, SimpleGraph.theorem_2, SimpleGraph.chromaticNumber_joinK, SimpleGraph.theorem_2_conjecture"
+      module: "ACN.Sec3"
+      status: "proved"
+    - source: "Section 3: fans, windmills, wheels; Proposition 1 (odd cycles)"
+      lean: "SimpleGraph.fan, SimpleGraph.windmill, SimpleGraph.wheel, SimpleGraph.proposition_1"
+      module: "ACN.Sec3Families"
+      status: "proved"
+    - source: "Theorem 3 and the conjecture for split graphs; Proposition 2"
+      lean: "SimpleGraph.IsSplitWith.theorem_3, SimpleGraph.split_graph_conjecture, SimpleGraph.proposition_2"
+      module: "ACN.Sec4"
+      status: "proved"
+      note: "Theorem 3 without the unneeded hypothesis T ≠ ∅."
+    - source: "Lemma 3 (ref. [6], Prop. 1) and Corollary 2"
+      lean: "SimpleGraph.lemma_3, SimpleGraph.corollary_2"
+      module: "ACN.Sec4"
+      status: "proved"
+    - source: "Proposition 3 (thin and thick headless spiders)"
+      lean: "SimpleGraph.proposition_3_thin, SimpleGraph.proposition_3_thick"
+      module: "ACN.Sec4Spiders"
+      status: "proved"
+    - source: "Proposition 4 (complete suns)"
+      lean: "SimpleGraph.proposition_4"
+      module: "ACN.Sec4Sun"
+      status: "proved"
+    - source: "Proposition 5 (cycle suns and wheel suns)"
+      lean: "SimpleGraph.proposition_5_cycle, SimpleGraph.proposition_5_wheel"
+      module: "ACN.Sec5"
+      status: "proved"
+
+acknowledgements: >-
+  Mathlib (in particular SimpleGraph, its degrees, chromatic number, pathGraph and cycleGraph)
+  and the Lean 4 toolchain.

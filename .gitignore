@@ -20,3 +20,6 @@ mizar/fm/body.tex
 mizar/fm/refs.tex
 mizar/fm/acn.build.log
 mizar/fm/__pycache__/
+
+# Lean: lake build directory and downloaded packages
+lean/.lake

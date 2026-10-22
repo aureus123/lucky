@@ -9,7 +9,7 @@ It contains:
 - the paper's results;
 - remarks on hypotheses that the paper leaves implicit, and small slips found while preparing the
   formalization;
-- machine-checked formalizations of Sections 1–5 in Isabelle/HOL and in Mizar.
+- machine-checked formalizations of Sections 1–5 in Isabelle/HOL, Mizar and Lean 4.
 
 | File or folder | Content |
 |---|---|
@@ -18,6 +18,7 @@ It contains:
 | [`others/`](others/README.md) | summaries of further papers on additive colorings and their techniques (Combinatorial Nullstellensatz, discharging, list and closed variants) |
 | [`isabelle/`](isabelle/README.md) | the formalization in Isabelle/HOL |
 | [`mizar/`](mizar/README.md) | the formalization in Mizar |
+| [`lean/`](lean/README.md) | the formalization in Lean 4 + Mathlib |
 
 The PDF file is not part of the repository (see [License](#license)).
 
@@ -163,7 +164,7 @@ Found while preparing and writing the formalization. None affects a result.
   - The paper writes $`r = m/3 + 1`$ (not an integer here) and $`f(v_{i-1}) = 1`$.
   - In fact $`r = (m+4)/3`$, so $`f(v_{i-1}) = r + 1 - \lceil m/3 \rceil = 2`$, and
     $`f(v_i) = 2 = 3r - m - f(v_{i-1})`$.
-  - The claimed recurrence still holds; it was checked for all $`m < 400`$ and proved in Isabelle and in Mizar.
+  - The claimed recurrence still holds; it was checked for all $`m < 400`$ and proved in Isabelle, Mizar and Lean.
 
 - **Brute-force check.** The exact formulas were checked against $`\eta`$ computed by brute force:
   - $`C_5, C_7, C_9`$;
@@ -186,6 +187,8 @@ Found while preparing and writing the formalization. None affects a result.
   $`\eta \le 4`$ is vacuous. The girth-26 case (non-bipartite, $`\eta \le 3 \le \chi`$) is not.
 - **Proof of Theorem 3, last case.** "Suppose that $`(q-t+1)(r_j - r_k) = \alpha`$" should read
   $`(q-t+1)(r_k - r_j) = \alpha`$. The contradiction is the same.
+- **Theorem 3 does not need $`T \neq \emptyset`$.** The labeling and the proof work for $`T = \emptyset`$ as
+  well, where the bound is $`\eta(G) \le |Q| + 1`$. The Lean statement drops the hypothesis.
 - **Proof of Proposition 2.** "we obtain $`\eta(G) = |Q| - 1`$" should read $`\eta(G) \le |Q| - 1`$.
   Equality comes from the true-twin bound. Theorem 3 applies because $`d(u) = |Q'| - 1 + |S'|`$ and
   $`d(v) = |Q'|`$ differ, which uses $`|S'| \ge 2`$.
@@ -204,8 +207,9 @@ Found while preparing and writing the formalization. None affects a result.
 
 ## 3. The formalizations
 
-Sections 1–5, with the proofs of Propositions 1–5 from the appendix, are formalized twice:
-in **Isabelle/HOL** (Isabelle2025-2) and in **Mizar** (8.1.15, MML 5.94.1493).
+Sections 1–5, with the proofs of Propositions 1–5 from the appendix, are formalized three times:
+in **Isabelle/HOL** (Isabelle2025-2), in **Mizar** (8.1.15, MML 5.94.1493) and in **Lean 4**
+(Lean 4.35.0, Mathlib v4.35.0).
 
 ### Isabelle/HOL
 
@@ -250,6 +254,31 @@ See [`mizar/README.md`](mizar/README.md).
   - `Fan`, `Windmill`, `Wheel`;
   - the conjecture for complete multipartite graphs, joins and split graphs:
     `Theorem1Conjecture`, `Theorem2Conjecture`, `SplitConjecture`.
+
+### Lean 4
+
+See [`lean/README.md`](lean/README.md).
+
+- **Libraries.** Graphs are Mathlib's `SimpleGraph` on a finite type; degrees, Δ and χ(G)
+  (`chromaticNumber`) are Mathlib's, and so are the paths and cycles (`pathGraph`,
+  `cycleGraph`). The join, spiders, suns and complete multipartite graphs are defined in the
+  project.
+- **Status.** Everything is proved, with no `sorry`; the main theorems use only the standard
+  axioms. The library (about 2700 lines) builds in about 3 min.
+- **No assumptions.** As in Isabelle and Mizar, Lemmas 2 and 3 of ref. [6], η(G) = min η_t(D),
+  η(P_N) = 2, χ(G ∨ K_q) ≥ χ(G) + q and the existence of additive colorings are proved.
+- **Automation.** The tactics `split_omega` and `mod_split` decide the arithmetic of the
+  labelings, which are defined by cases with divisions by constants. The recurrence of
+  Proposition 4 is a single call.
+- **Requirements and installation.** [elan](https://github.com/leanprover/elan) (it installs
+  Lean 4.35.0); Mathlib v4.35.0 is fetched by `lake`. Run `cd lean && lake exe cache get &&
+  ./build.sh`.
+- **Main theorems.**
+  - `theorem_1`, `theorem_2`, `IsSplitWith.theorem_3`, `proposition_1` … `proposition_5_wheel`;
+  - `lemma_2_value`, `lemma_2_finite_iff`, `lemma_3`, `corollary_2`, `eta_eq_iInf_etaT`;
+  - `fan`, `windmill`, `wheel`;
+  - the conjecture for complete multipartite graphs, joins and split graphs:
+    `theorem_1_conjecture`, `theorem_2_conjecture`, `split_graph_conjecture`.
 
 ---
 
