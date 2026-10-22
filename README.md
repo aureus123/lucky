@@ -187,8 +187,11 @@ Found while preparing and writing the formalization. None affects a result.
   $`\eta \le 4`$ is vacuous. The girth-26 case (non-bipartite, $`\eta \le 3 \le \chi`$) is not.
 - **Proof of Theorem 3, last case.** "Suppose that $`(q-t+1)(r_j - r_k) = \alpha`$" should read
   $`(q-t+1)(r_k - r_j) = \alpha`$. The contradiction is the same.
-- **Theorem 3 does not need $`T \neq \emptyset`$.** The labeling and the proof work for $`T = \emptyset`$ as
-  well, where the bound is $`\eta(G) \le |Q| + 1`$. The Lean statement drops the hypothesis.
+- **Theorem 3 does not need $`T \neq \emptyset`$, but the hypothesis is harmless.** The labeling and the
+  proof also work for $`T = \emptyset`$, where the bound is $`\eta(G) \le |Q| + 1`$. This case is never
+  useful: any single vertex of $`Q`$ forms a valid $`T`$, and $`T = \{u\}`$ gives the better bound
+  $`\eta(G) \le |Q|`$. ($`Q`$ is nonempty unless $`G`$ has no vertices.) The Lean statement drops the
+  hypothesis only because it is not needed.
 - **Proof of Proposition 2.** "we obtain $`\eta(G) = |Q| - 1`$" should read $`\eta(G) \le |Q| - 1`$.
   Equality comes from the true-twin bound. Theorem 3 applies because $`d(u) = |Q'| - 1 + |S'|`$ and
   $`d(v) = |Q'|`$ differ, which uses $`|S'| \ge 2`$.

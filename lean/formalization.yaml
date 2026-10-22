@@ -153,7 +153,9 @@ fidelity:
     In the proof of Theorem 1, the step "i ≥ j" is false (e.g. part sizes (3, 1) ordered as
     (1, 3)), and so is the inequality s'_j ≥ s_i that it is used for. The lower bound is proved
     by a different argument (mpBound_sorted_le); η(G) ≤ r is proved from the closed form of s_i.
-    Theorem 3 is stated without the hypothesis T ≠ ∅, which the proof does not need. In the
+    Theorem 3 is stated without the hypothesis T ≠ ∅, which the proof does not need; the
+    hypothesis is harmless, since T = ∅ only gives η(G) ≤ |Q| + 1, weaker than the bound |Q|
+    obtained from T = {u}, u ∈ Q. In the
     appendix's proof of Proposition 4, case m ≡ 2 (mod 6), i = ⌊m/2⌋ + 1, the paper writes
     r = m/3 + 1 and f(v_{i-1}) = 1; in fact r = (m + 4)/3 and f(v_{i-1}) = 2, and the claimed
     recurrence still holds (ks_claim). The lower bound of Proposition 1 obtains the paper's
@@ -199,7 +201,7 @@ alignment:
       lean: "SimpleGraph.IsSplitWith.theorem_3, SimpleGraph.split_graph_conjecture, SimpleGraph.proposition_2"
       module: "ACN.Sec4"
       status: "proved"
-      note: "Theorem 3 without the unneeded hypothesis T ≠ ∅."
+      note: "Theorem 3 without the hypothesis T ≠ ∅, which is not needed but harmless (T = ∅ only gives |Q| + 1)."
     - source: "Lemma 3 (ref. [6], Prop. 1) and Corollary 2"
       lean: "SimpleGraph.lemma_3, SimpleGraph.corollary_2"
       module: "ACN.Sec4"

@@ -95,7 +95,8 @@ uses without proof: η(G) = min η_t(D), η(P_N) = 2, η(K_n) = n (through windm
 - **Theorem 1.** The lower bound uses a different argument (`mpBound_sorted_le`), because the
   paper's step "i ≥ j" is false.
 - **Theorem 1, η(G) ≤ r.** It is proved from the closed form of s_i (`mpBound_le_card`).
-- **Theorem 3.** The hypothesis T ≠ ∅ is not needed, so it is dropped.
+- **Theorem 3.** The hypothesis T ≠ ∅ is not needed, so it is dropped. It is harmless: T = ∅
+  only gives η(G) ≤ |Q| + 1, while T = {u} for any u ∈ Q gives η(G) ≤ |Q|.
 - **Proposition 2.** Theorem 3 is applied to the maximal clique Q' ∪ {v}.
 - **Proposition 4.** In the case m ≡ 2 (mod 6), i = ⌊m/2⌋ + 1, the paper writes r = m/3 + 1 and
   f(v_{i−1}) = 1. In fact r = (m + 4)/3 and f(v_{i−1}) = 2. `ks_claim` checks the claimed
