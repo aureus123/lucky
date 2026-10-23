@@ -23,3 +23,15 @@ mizar/fm/__pycache__/
 
 # Lean: lake build directory and downloaded packages
 lean/.lake
+
+# Rocq: generated makefiles and compiled files
+rocq/Makefile
+rocq/Makefile.conf
+rocq/.Makefile.d
+rocq/**/*.vo
+rocq/**/*.vok
+rocq/**/*.vos
+rocq/**/*.glob
+rocq/**/.*.aux
+rocq/.lia.cache
+rocq/.nia.cache

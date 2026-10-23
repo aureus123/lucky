@@ -9,7 +9,7 @@ It contains:
 - the paper's results;
 - remarks on hypotheses that the paper leaves implicit, and small slips found while preparing the
   formalization;
-- machine-checked formalizations of Sections 1–5 in Isabelle/HOL, Mizar and Lean 4.
+- machine-checked formalizations of Sections 1–5 in Isabelle/HOL, Mizar, Lean 4 and Rocq.
 
 | File or folder | Content |
 |---|---|
@@ -19,6 +19,7 @@ It contains:
 | [`isabelle/`](isabelle/README.md) | the formalization in Isabelle/HOL |
 | [`mizar/`](mizar/README.md) | the formalization in Mizar |
 | [`lean/`](lean/README.md) | the formalization in Lean 4 + Mathlib |
+| [`rocq/`](rocq/README.md) | the formalization in Rocq + MathComp/ssreflect |
 
 The PDF file is not part of the repository (see [License](#license)).
 
@@ -164,7 +165,7 @@ Found while preparing and writing the formalization. None affects a result.
   - The paper writes $`r = m/3 + 1`$ (not an integer here) and $`f(v_{i-1}) = 1`$.
   - In fact $`r = (m+4)/3`$, so $`f(v_{i-1}) = r + 1 - \lceil m/3 \rceil = 2`$, and
     $`f(v_i) = 2 = 3r - m - f(v_{i-1})`$.
-  - The claimed recurrence still holds; it was checked for all $`m < 400`$ and proved in Isabelle, Mizar and Lean.
+  - The claimed recurrence still holds; it was checked for all $`m < 400`$ and proved in Isabelle, Mizar, Lean and Rocq.
 
 - **Brute-force check.** The exact formulas were checked against $`\eta`$ computed by brute force:
   - $`C_5, C_7, C_9`$;
@@ -190,7 +191,7 @@ Found while preparing and writing the formalization. None affects a result.
 - **Theorem 3 does not need $`T \neq \emptyset`$, but the hypothesis is harmless.** The labeling and the
   proof also work for $`T = \emptyset`$, where the bound is $`\eta(G) \le |Q| + 1`$. This case is never
   useful: any single vertex of $`Q`$ forms a valid $`T`$, and $`T = \{u\}`$ gives the better bound
-  $`\eta(G) \le |Q|`$. ($`Q`$ is nonempty unless $`G`$ has no vertices.) The Lean statement drops the
+  $`\eta(G) \le |Q|`$. ($`Q`$ is nonempty unless $`G`$ has no vertices.) The Lean and Rocq statements drop the
   hypothesis only because it is not needed.
 - **Proof of Proposition 2.** "we obtain $`\eta(G) = |Q| - 1`$" should read $`\eta(G) \le |Q| - 1`$.
   Equality comes from the true-twin bound. Theorem 3 applies because $`d(u) = |Q'| - 1 + |S'|`$ and
@@ -210,9 +211,9 @@ Found while preparing and writing the formalization. None affects a result.
 
 ## 3. The formalizations
 
-Sections 1–5, with the proofs of Propositions 1–5 from the appendix, are formalized three times:
-in **Isabelle/HOL** (Isabelle2025-2), in **Mizar** (8.1.15, MML 5.94.1493) and in **Lean 4**
-(Lean 4.35.0, Mathlib v4.35.0).
+Sections 1–5, with the proofs of Propositions 1–5 from the appendix, are formalized four times:
+in **Isabelle/HOL** (Isabelle2025-2), in **Mizar** (8.1.15, MML 5.94.1493), in **Lean 4**
+(Lean 4.35.0, Mathlib v4.35.0) and in **Rocq** (Rocq 9.3, MathComp 2.6).
 
 ### Isabelle/HOL
 
@@ -279,6 +280,36 @@ See [`lean/README.md`](lean/README.md).
 - **Main theorems.**
   - `theorem_1`, `theorem_2`, `IsSplitWith.theorem_3`, `proposition_1` … `proposition_5_wheel`;
   - `lemma_2_value`, `lemma_2_finite_iff`, `lemma_3`, `corollary_2`, `eta_eq_iInf_etaT`;
+  - `fan`, `windmill`, `wheel`;
+  - the conjecture for complete multipartite graphs, joins and split graphs:
+    `theorem_1_conjecture`, `theorem_2_conjecture`, `split_graph_conjecture`.
+
+### Rocq
+
+See [`rocq/README.md`](rocq/README.md).
+
+- **Libraries.** MathComp/ssreflect (finite types, finite sets, big sums) and the graph library
+  [coq-graph-theory](https://github.com/coq-community/graph-theory) of C. Doczkal and D. Pous:
+  its simple graphs (`sgraph`, `x -- y`), N(v), cliques, `'K_q` and chromatic number χ. The
+  degrees, Δ, the join G ∨ H, spiders, suns and the other families are defined in the
+  project.
+- **Status.** Everything is proved, with no `Admitted`. The main theorems use **no axioms at
+  all** (`Print Assumptions` reports them closed under the global context). The development
+  (about 2650 lines) builds in about 2 min.
+- **No assumptions.** As in the other formalizations, Lemmas 2 and 3 of ref. [6],
+  η(G) = min η_t(D), η(P_N) = 2, χ(G ∨ K_q) ≥ χ(G) + q and the existence of additive colorings
+  are proved.
+- **Automation.** Rocq's `lia` (with mczify) already handles the divisions by constants. The
+  Ltac2 tactic `split_lia` adds the case analysis on the `if`s of the labelings, and `nlia`
+  normalizes MathComp's canonical instances before `lia`. The recurrence of Proposition 4 is a
+  single call.
+- **Requirements and installation.** [Rocq 9.3](https://rocq-prover.org), MathComp 2.6
+  (`rocq-mathcomp-ssreflect`), mczify (`coq-mathcomp-zify`), MathComp finmap and
+  coq-graph-theory (pinned to its development version, see
+  [`rocq/README.md`](rocq/README.md)), from opam. Run `rocq/build.sh`.
+- **Main theorems.**
+  - `theorem_1`, `theorem_2`, `theorem_3`, `proposition_1` … `proposition_5_wheel`;
+  - `lemma_2_value`, `lemma_2_finite_iff`, `lemma_3`, `corollary_2`, `eta_eq_min_etaT`;
   - `fan`, `windmill`, `wheel`;
   - the conjecture for complete multipartite graphs, joins and split graphs:
     `theorem_1_conjecture`, `theorem_2_conjecture`, `split_graph_conjecture`.

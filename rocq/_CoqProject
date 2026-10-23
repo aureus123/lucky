@@ -1,0 +1,11 @@
+-Q theories ACN
+-arg -w -arg -notation-overridden,-rewrite-rw,-deprecated
+theories/Tactics.v
+theories/Basics.v
+theories/Sec2.v
+theories/Sec3.v
+theories/Sec3Families.v
+theories/Sec4.v
+theories/Sec4Spiders.v
+theories/Sec4Sun.v
+theories/Sec5.v
