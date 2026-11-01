@@ -2,6 +2,15 @@
 *.pdf
 # except the generated FM-style paper of the Mizar article
 !mizar/acn.pdf
+# and the (a,b)-additive coloring paper
+!abadditive/abadditive.pdf
+
+# (a,b)-additive colorings: working notes, scripts and LaTeX build files stay local
+abadditive/AB.md
+abadditive/*.py
+abadditive/*.aux
+abadditive/*.log
+abadditive/*.out
 
 # OS files
 .DS_Store

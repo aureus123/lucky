@@ -20,6 +20,7 @@ It contains:
 | [`mizar/`](mizar/README.md) | the formalization in Mizar |
 | [`lean/`](lean/README.md) | the formalization in Lean 4 + Mathlib |
 | [`rocq/`](rocq/README.md) | the formalization in Rocq + MathComp/ssreflect |
+| `abadditive/` | work in progress on a related problem, (a,b)-additive colorings: the minimum (a,b)-additive chromatic violation problem and the polytope of its integer programming formulation (`abadditive.tex`, `abadditive.pdf`) |
 
 The PDF file is not part of the repository (see [License](#license)).
 

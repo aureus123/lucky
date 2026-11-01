@@ -1,0 +1,850 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{times,hyperref}
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage[T1]{fontenc}
+
+\oddsidemargin 0in
+\textwidth 6.5in
+\topmargin 0in
+\headheight 12pt
+\headsep 25pt
+\footskip 30pt
+\textheight 9.0in
+
+\newcommand{\ie}{{i.e.~}}
+\newcommand{\eg}{{e.g.~}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Eb}{\overline{E}}
+\newcommand{\etav}{\eta_v^{a,b}}
+
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}{Lemma}
+\newtheorem{prop}{Proposition}
+\newtheorem{cor}{Corollary}
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
+\newtheorem{rem}{Remark}
+\newtheorem{ex}{Example}
+
+\begin{document}
+
+\begin{center}
+\huge The Minimum $(a,b)$-Additive Chromatic Violation Problem
+\end{center}
+
+\section*{Introduction}
+
+A \emph{lucky labeling} (or \emph{additive coloring}) of a graph $G$ is a labeling $f : V \to \{1, \ldots, k\}$ such that
+$f(N(u)) \neq f(N(v))$ for every edge $uv$, where $f(S)$ is the sum of the labels of the vertices of $S$; \ie the sums of the
+labels of the neighbors form a proper coloring of $G$. The least such $k$ is the \emph{lucky number} (or \emph{additive chromatic number}) $\eta(G)$. Czerwi\'nski, Grytczuk and
+\.Zelazny~\cite{CGZ09} introduced this parameter and proposed the following conjecture.
+
+\medskip
+\noindent\textbf{Additive Coloring Conjecture~\cite{CGZ09}.} For every graph $G$, $\eta(G) \leq \chi(G)$.
+\medskip
+
+The conjecture has been proved for some families, such as trees, complete graphs, some planar graphs of large girth, and split
+graphs (see~\cite{Sev20} and the references therein). It is open even for bipartite graphs. There, since $\chi(G) = 2$ when
+$G$ has at least one edge, the conjecture states that $\eta(G) \leq 2$. This has been proved for some subclasses, for example trees~\cite{CGZ09}
+and regular bipartite graphs~\cite{Sev20}. For planar bipartite graphs, Czerwi\'nski et al.~proved $\eta(G) \leq 3$~\cite{CGZ09}, and, as far as we
+know, it is not even known whether $\eta$ is bounded on bipartite graphs.
+
+In the terminology of the next section, $\eta(G) \leq 2$ means that $G$ has a $(1,2)$-additive coloring, since a labeling with
+labels in $\{1\}$ is in particular a labeling with labels in $\{1,2\}$. That is, $\eta(G) \leq 2$ if and only if $\eta_v^{1,2}(G) = 0$. Therefore,
+the Additive Coloring Conjecture restricted to bipartite graphs is equivalent to the statement
+$$\eta_v^{1,2}(G) = 0 \qquad \textrm{for every bipartite graph } G,$$
+and a bipartite graph with $\eta_v^{1,2}(G) > 0$ would be a counterexample. This is one motivation for studying the minimization
+problem below and the polytope of its integer programming formulation. Note that only the ratio $a : b$ matters (Remark~\ref{RSCALE}), so
+$(1,2)$ can be replaced by any pair $(t, 2t)$ with $t > 0$.
+
+\section{Definitions}
+
+Let $G = (V,E)$ be a simple graph, $N(v)$ the set of neighbors of $v$ and $d(v) = |N(v)|$ its degree.
+For a function $g : V \to \Z$ and $S \subseteq V$ we write $g(S) = \sum_{w \in S} g(w)$.
+Throughout, $a$ and $b$ are integers with $a < b$, and $\delta = b - a > 0$. (The case $a > b$ is the same problem with
+the roles of $a$ and $b$ exchanged, and the case $a = b$ is trivial, since then the colors do not depend on the labeling.)
+
+\begin{defn}
+An \emph{$(a,b)$-labeling} of $G$ is a function $\ell : V \to \{a, b\}$. Its \emph{color function}
+$c_\ell : V \to \Z$ is $c_\ell(v) = \ell(N(v))$. An edge $uv \in E$ is \emph{violated} by $\ell$ if
+$c_\ell(u) = c_\ell(v)$, and the \emph{violation} of $\ell$ is
+$$\nu_{a,b}(G, \ell) = |\{ uv \in E : c_\ell(u) = c_\ell(v) \}|.$$
+The labeling $\ell$ is an \emph{$(a,b)$-additive coloring} of $G$ if $\nu_{a,b}(G,\ell) = 0$, \ie if $c_\ell$
+is a proper coloring of $G$.
+\end{defn}
+
+\begin{defn}
+The \emph{Minimum $(a,b)$-Additive Chromatic Violation Problem} consists of finding an $(a,b)$-labeling of $G$
+of minimum violation. Its optimal value is denoted by
+$$\etav(G) = \min \{ \nu_{a,b}(G, \ell) : \ell : V \to \{a,b\} \}.$$
+\end{defn}
+
+Clearly, $\etav(G) = 0$ if and only if $G$ admits an $(a,b)$-additive coloring. The case $(a,b) = (0,1)$ corresponds to
+the $(0,1)$-additive labelings of Ahadi and Dehghan~\cite{AD16} (who denote by $\eta_1(G)$ the minimum number of
+$1$'s in a $(0,1)$-additive labeling, a different parameter). The notation is borrowed from the chromatic violation number
+$\chi_v(G,F,C)$ of the minimum chromatic violation problem, introduced in~\cite{BDEMUV20}; the symbols $\chi_v(G,F,C)$
+and $\nu(G,F,\varphi)$, the latter for the violation of a semi-coloring $\varphi$, are those of~\cite{UDE23}.
+
+\begin{rem} \label{RSCALE}
+No bound is imposed on the number of colors used by $c_\ell$.
+Moreover, $\eta_v^{a,b}(G) = \eta_v^{-b,-a}(G)$ (multiply $\ell$ by $-1$), and $\eta_v^{a,b}(G) = \eta_v^{ta,tb}(G)$ for every integer $t > 0$
+(multiply $\ell$ by $t$: all colors are multiplied by $t$, so the violated edges do not change).
+\end{rem}
+
+\begin{prop} \label{PCOMP}
+If $G$ is the disjoint union of $G_1, \ldots, G_n$, then $\etav(G) = \sum_{i=1}^{n} \etav(G_i)$.
+\end{prop}
+\begin{proof}
+An $(a,b)$-labeling $\ell$ of $G$ is the same as a choice of an $(a,b)$-labeling $\ell_i$ of each $G_i$, where $\ell_i$ is the
+restriction of $\ell$ to $V(G_i)$. If $v \in V(G_i)$, then $N(v) \subseteq V(G_i)$, so $c_\ell(v) = c_{\ell_i}(v)$. Since every
+edge of $G$ belongs to some $G_i$, we get $\nu_{a,b}(G,\ell) = \sum_{i=1}^{n} \nu_{a,b}(G_i,\ell_i)$. The terms of this sum
+depend on independent choices, so its minimum over all $\ell$ is the sum of the minima, \ie $\sum_{i=1}^{n} \etav(G_i)$.
+\end{proof}
+
+In particular, $G$ admits an $(a,b)$-additive coloring if and only if each of its components does, and isolated vertices
+do not contribute to $\etav(G)$. Note the difference with the additive number, for which $\eta(G)$ is the maximum of the
+$\eta(G_i)$. From now on we assume that $G$ is connected.
+
+\begin{ex} \label{EXNET}
+Let $G$ be the \emph{net}: a triangle $t_1 t_2 t_3$ together with a pendant vertex $p_i$ adjacent to $t_i$, for $i = 1, 2, 3$.
+$G$ is additive $2$-colorable and admits $(0,1)$- and $(1,2)$-additive colorings, but $\eta_v^{-1,1}(G) = 1$.
+
+Indeed, let $\ell$ be a $(-1,1)$-labeling, $S = \ell(\{t_1,t_2,t_3\})$ and $d_i = \ell(p_i) - \ell(t_i) \in \{-2,0,2\}$.
+Then $c(p_i) = \ell(t_i)$ and $c(t_i) = S + d_i$. Hence the edge $t_it_j$ is violated if and only if $d_i = d_j$,
+and the edge $t_ip_i$ is violated if and only if $d_i = \ell(t_i) - S$.
+Suppose that no edge is violated. Then $\{d_1, d_2, d_3\} = \{-2, 0, 2\}$. If $\ell(t_1) = \ell(t_2) = \ell(t_3) = \epsilon$, then
+every $d_i \in \{0, -2\epsilon\}$, a contradiction. Otherwise $S = \pm 1$; by symmetry ($\ell \mapsto -\ell$) assume $S = 1$, so
+the labels of the triangle are $1, 1, -1$. The vertex with label $-1$ has $d_i \in \{0, 2\}$ and the two vertices with
+label $1$ have $d_i \in \{-2, 0\}$, so one of the latter has $d_i = 0 = \ell(t_i) - S$ and its pendant edge is violated,
+a contradiction. Therefore $\eta_v^{-1,1}(G) \geq 1$. The labeling $\ell(t_1,t_2,t_3) = (-1,-1,1)$, $\ell(p_1,p_2,p_3) = (-1,1,-1)$
+gives $c(t_1,t_2,t_3) = (-1,1,-3)$ and $c(p_1,p_2,p_3) = (-1,-1,1)$, whose only violated edge is $t_1p_1$.
+\end{ex}
+
+\section{An integer programming formulation}
+
+Let $\Eb = \{ (u,v), (v,u) : uv \in E \}$. For $(u,v) \in \Eb$ let
+$$P_{uv} = N(u) \backslash N(v), \qquad Q_{uv} = N(v) \backslash N(u).$$
+Note that $u \in Q_{uv}$, so $|Q_{uv}| \geq 1$.
+
+We use binary variables $x(v)$ for $v \in V$, where the label of $v$ is $a$ if $x(v) = 0$ and $b$ if $x(v) = 1$, \ie
+$\ell(v) = a + \delta\,x(v)$, and binary variables $z(u,v)$ for $(u,v) \in \Eb$, where $z(u,v) = 1$ forces $c(u) < c(v)$.
+Since $c(u) = a\,d(u) + \delta\,x(N(u))$ and the common neighbors of $u$ and $v$ cancel out,
+\begin{equation} \label{EDIFF}
+c(u) - c(v) = a\,(d(u) - d(v)) + \delta\,\bigl(x(P_{uv}) - x(Q_{uv})\bigr).
+\end{equation}
+For $(u,v) \in \Eb$ define
+$$\beta_{uv} = \biggl\lceil \frac{a\,(d(v) - d(u))}{\delta} \biggr\rceil - 1, \qquad M_{uv} = |P_{uv}| - \beta_{uv}.$$
+The formulation is:
+\begin{align}
+\min~ & |E| - \sum_{(u,v) \in \Eb} z(u,v) & & \notag \\
+\textrm{s.t.}~ & x(P_{uv}) - x(Q_{uv}) + M_{uv}\, z(u,v) \leq M_{uv} + \beta_{uv}, & \forall~~(u,v) \in \Eb \label{RLABEL}\\
+ & z(u,v) + z(v,u) \leq 1, & \forall~~uv \in E \label{RZ}\\
+ & z(u,v) \in \{0, 1\}, & \forall~~(u,v) \in \Eb \label{RZBND} \\
+ & x(v) \in \{0, 1\}, & \forall~~v \in V \label{RXBND}
+\end{align}
+
+\begin{lem} \label{LSTRICT}
+Let $x \in \{0,1\}^V$ and $(u,v) \in \Eb$. Then $c(u) < c(v)$ if and only if $x(P_{uv}) - x(Q_{uv}) \leq \beta_{uv}$.
+\end{lem}
+\begin{proof}
+Let $D = x(P_{uv}) - x(Q_{uv}) \in \Z$. By (\ref{EDIFF}), $c(u) < c(v)$ if and only if $D < a\,(d(v) - d(u))/\delta$.
+For an integer $D$ and a real number $r$, $D < r$ if and only if $D \leq \lceil r \rceil - 1$.
+\end{proof}
+
+Since $x(P_{uv}) - x(Q_{uv}) \leq |P_{uv}| = M_{uv} + \beta_{uv}$, constraint (\ref{RLABEL}) is redundant when $z(u,v) = 0$,
+and by Lemma~\ref{LSTRICT} it is equivalent to $c(u) < c(v)$ when $z(u,v) = 1$. Therefore an integer vector $(x,z)$ satisfies
+(\ref{RLABEL}), (\ref{RZBND}) and (\ref{RXBND}) if and only if
+\begin{equation} \label{EFEAS}
+z(u,v) = 1 \Longrightarrow c(u) < c(v), \qquad \forall~(u,v) \in \Eb,
+\end{equation}
+where $c$ is the color function of the labeling encoded by $x$.
+In particular, constraints (\ref{RZ}) are implied by the others on integer points, and (\ref{RLABEL}) can be dropped
+whenever $M_{uv} \leq 0$ (in that case $c(u) < c(v)$ holds for every $x$).
+
+\begin{prop}
+The optimal value of the formulation is $\etav(G)$.
+\end{prop}
+\begin{proof}
+Let $(x,z)$ be feasible and $\ell$ the labeling encoded by $x$. If $z(u,v) + z(v,u) = 1$ for an edge $uv$, then
+by (\ref{EFEAS}) $c(u) \neq c(v)$ and $uv$ is not violated. By (\ref{RZ}), the objective value equals the number of edges
+$uv$ with $z(u,v) = z(v,u) = 0$, which is at least $\nu_{a,b}(G,\ell) \geq \etav(G)$.
+Conversely, given an $(a,b)$-labeling $\ell$, let $x(v) = 1$ if and only if $\ell(v) = b$, and $z(u,v) = 1$ if and only if
+$c(u) < c(v)$. This vector is feasible and its objective value is $\nu_{a,b}(G,\ell)$.
+\end{proof}
+
+\section{Dimension of the polytope}
+
+Let $P^{a,b}(G) \subseteq \mathbb{R}^{V} \times \mathbb{R}^{\Eb}$ be the convex hull of the integer solutions of
+(\ref{RLABEL})--(\ref{RXBND}).
+
+\begin{prop} \label{PDIM}
+Let
+$$ST = \{ (s,t) \in \Eb : b\,|N(t) \backslash N(s)| > a\,|N(s) \backslash N(t)| \}.$$
+Then $\dim(P^{a,b}(G)) = |V| + |ST|$ and a minimal equation system for $P^{a,b}(G)$ is:
+$$z(s,t) = 0,~~~~~~~~~~~~~~\forall~(s,t) \in \Eb \backslash ST.$$
+\end{prop}
+\begin{proof}
+Let $(s,t) \in \Eb$ and $x \in \{0,1\}^V$. By (\ref{EDIFF}),
+$c(t) - c(s) = \ell(Q_{st}) - \ell(P_{st}) \leq b\,|Q_{st}| - a\,|P_{st}|$, with equality when $x$ is the characteristic
+vector $\chi^{Q_{st}}$ of $Q_{st}$ (recall that $P_{st} \cap Q_{st} = \emptyset$). Therefore
+\begin{equation} \label{EST}
+(s,t) \notin ST \iff c(s) \geq c(t) \textrm{ for every } x \in \{0,1\}^V \iff \chi^{Q_{st}} \textrm{ does not satisfy } c(s) < c(t).
+\end{equation}
+
+By (\ref{EFEAS}) and (\ref{EST}), every integer solution satisfies $z(s,t) = 0$ for all $(s,t) \notin ST$. Since these
+equalities are linearly independent, $\dim(P^{a,b}(G)) \leq |V| + |ST|$.
+
+To prove that $\dim(P^{a,b}(G)) \geq |V| + |ST|$, we propose $|V| + |ST| + 1$ affinely
+independent points of $P^{a,b}(G)$. They are feasible by (\ref{EFEAS}) and (\ref{EST}).
+\begin{itemize}
+\item Sol. 0: $x^0 = \mathbf{0}$, $z^0 = \mathbf{0}$.
+\item Sol. $r$, for $r \in V$: $x^r = e_r$ (\ie $\ell(r) = b$ and $\ell(w) = a$ for all $w \neq r$), $z^r = \mathbf{0}$.
+\item Sol. $(s,t)$, for $(s,t) \in ST$: $x^{(s,t)} = \chi^{Q_{st}}$, $z^{(s,t)} = e_{(s,t)}$.
+\end{itemize}
+Consider coefficients $\alpha$ such that
+$$\alpha^0 (x^0, z^0) + \sum_{r \in V} \alpha^r (x^r, z^r)
+  + \sum_{(s,t) \in ST} \alpha^{(s,t)} (x^{(s,t)}, z^{(s,t)}) = 0,~~~~~~(A)$$
+$$\alpha^0 + \sum_{r \in V} \alpha^r + \sum_{(s,t) \in ST} \alpha^{(s,t)} = 0.~~~~~~(B)$$
+The component $(s',t') \in ST$ of $(A)$ gives $\alpha^{(s',t')} = 0$.
+Then the component $r' \in V$ of $(A)$ gives $\alpha^{r'} = 0$, and finally $\alpha^0 = 0$ by $(B)$.
+\end{proof}
+
+\begin{rem}
+The proof does not require $a$ and $b$ to be consecutive integers. In the formulation with the original variables
+$f(v) = a + \delta\,x(v) \in \{a,b\}$, Sol.~$r$ has $f^r(r) = a + \delta = b$, and the component $r'$ of $(A)$
+minus $a$ times $(B)$ gives $\delta\,\alpha^{r'} = 0$, hence $\alpha^{r'} = 0$ since $\delta \neq 0$.
+The only other place where the labels matter is the strict inequality $c(s) < c(t)$, which is equivalent to
+$c(s) \leq c(t) - 1$ because colors are integers.
+\end{rem}
+
+\begin{cor}
+If $a \leq 0 \leq b$ (in particular for $(a,b) = (0,1)$ and $(a,b) = (-1,1)$), then $P^{a,b}(G)$ is full-dimensional,
+\ie $\dim(P^{a,b}(G)) = |V| + 2|E|$. For example, for the net $G$ of Example~\ref{EXNET}, $\dim(P^{-1,1}(G)) = 6 + 12 = 18$.
+\end{cor}
+\begin{proof}
+Let $(s,t) \in \Eb$. Then $|N(t) \backslash N(s)| \geq 1$ and $|N(s) \backslash N(t)| \geq 1$, since $s \in N(t) \backslash N(s)$ and
+$t \in N(s) \backslash N(t)$. Hence $b\,|N(t) \backslash N(s)| \geq 0 \geq a\,|N(s) \backslash N(t)|$, and at least one of these
+inequalities is strict because $a < b$ implies $a < 0$ or $b > 0$. Therefore $(s,t) \in ST$, and $ST = \Eb$.
+\end{proof}
+
+\begin{rem}
+Outside the range of the corollary, $ST$ may be a proper subset of $\Eb$. If $0 < a < b$, then $(s,t) \notin ST$ if and only if
+$|N(s) \backslash N(t)| \geq (b/a)\,|N(t) \backslash N(s)|$, \ie $s$ has many more private neighbors than $t$.
+If $a < b < 0$, the condition is mirrored: dividing $b\,|N(t) \backslash N(s)| \leq a\,|N(s) \backslash N(t)|$ by $b < 0$,
+$(s,t) \notin ST$ if and only if $|N(t) \backslash N(s)| \geq (a/b)\,|N(s) \backslash N(t)|$ with $a/b > 1$, \ie $t$ has many more
+private neighbors than $s$.
+\end{rem}
+
+\section{Facets of the formulation}
+
+In this section we determine which constraints of (\ref{RLABEL})--(\ref{RXBND}) define facets of $P^{a,b}(G)$. Following
+Coll et al.~\cite{CMMZ02}, the proofs use pairs of points of the face instead of explicit sets of affinely independent
+points.
+
+\subsection{Preliminaries}
+
+For $(u,v) \in \Eb$ let $W_{uv} = P_{uv} \cup Q_{uv} = N(u) \,\triangle\, N(v)$; note that $W_{uv} = W_{vu}$, $P_{vu} = Q_{uv}$,
+and $u \in Q_{uv}$, $v \in P_{uv}$, so $|W_{uv}| \geq 2$. For $x \in \{0,1\}^V$, the \emph{defect} of $x$ at $(u,v)$ is
+$$y_{uv}(x) = x(P_{uv}) + |Q_{uv}| - x(Q_{uv}) = |\{ w \in W_{uv} : x(w) \neq \chi^{Q_{uv}}(w) \}|,$$
+\ie the Hamming distance on $W_{uv}$ between $x$ and the characteristic vector of $Q_{uv}$, and we let
+$$\kappa_{uv} = \biggl\lceil \frac{b\,|Q_{uv}| - a\,|P_{uv}|}{\delta} \biggr\rceil - 1.$$
+
+\begin{lem} \label{LREAL}
+Let $(u,v) \in \Eb$ and $x \in \{0,1\}^V$. Then $c(v) - c(u) = b|Q_{uv}| - a|P_{uv}| - \delta\,y_{uv}(x)$; hence
+$c(u) < c(v)$ if and only if $y_{uv}(x) \leq \kappa_{uv}$. Moreover:
+\begin{itemize}
+\item $\kappa_{uv} = \beta_{uv} + |Q_{uv}|$;
+\item $(u,v) \in ST$ if and only if $\kappa_{uv} \geq 0$;
+\item constraint (\ref{RLABEL}) can be written as $y_{uv}(x) + (|W_{uv}| - \kappa_{uv})\, z(u,v) \leq |W_{uv}|$, and it is redundant
+if and only if $\kappa_{uv} \geq |W_{uv}|$.
+\end{itemize}
+\end{lem}
+\begin{proof}
+By (\ref{EDIFF}), $c(v) - c(u) = \ell(Q_{uv}) - \ell(P_{uv})$. A vertex $w \in Q_{uv}$ contributes $b$ if $x(w) = 1$ and $a = b - \delta$
+otherwise, and a vertex $w \in P_{uv}$ contributes $-a$ if $x(w) = 0$ and $-b = -a - \delta$ otherwise. So every defect lowers
+$c(v) - c(u)$ by $\delta$ from $b|Q_{uv}| - a|P_{uv}|$, which proves the formula. Thus $c(u) < c(v)$ if and only if
+$y_{uv}(x) < (b|Q_{uv}| - a|P_{uv}|)/\delta$, and since $y_{uv}(x)$ is an integer, if and only if $y_{uv}(x) \leq \kappa_{uv}$.
+Since $d(v) - d(u) = |Q_{uv}| - |P_{uv}|$, we have
+$\beta_{uv} + |Q_{uv}| = \lceil (a|Q_{uv}| - a|P_{uv}| + \delta |Q_{uv}|)/\delta \rceil - 1 = \kappa_{uv}$.
+By definition, $(u,v) \in ST$ if and only if $b|Q_{uv}| - a|P_{uv}| > 0$, \ie $\kappa_{uv} \geq 0$. Finally,
+$x(P_{uv}) - x(Q_{uv}) = y_{uv}(x) - |Q_{uv}|$ and $M_{uv} = |P_{uv}| - \beta_{uv} = |W_{uv}| - \kappa_{uv}$, so (\ref{RLABEL}) becomes
+$y_{uv}(x) - |Q_{uv}| + (|W_{uv}| - \kappa_{uv}) z(u,v) \leq |P_{uv}|$, as claimed; and $M_{uv} \leq 0$ if and only if
+$\kappa_{uv} \geq |W_{uv}|$.
+\end{proof}
+
+For example, $\kappa_{uv} = |N(v) \backslash N(u)| - 1$ when $(a,b) = (0,1)$, and $\kappa_{uv} = \lceil |W_{uv}|/2 \rceil - 1$ when
+$(a,b) = (-1,1)$. In the latter case $\kappa_{uv} = 0$ if and only if $W_{uv} = \{u,v\}$, \ie $u$ and $v$ are closed twins.
+
+For $x \in \{0,1\}^V$ let $R(x) = \{ (u,v) \in \Eb : c(u) < c(v) \}$ be the set of arcs \emph{realized} by $x$. A set $C \subseteq \Eb$
+is \emph{realizable} if $C \subseteq R(x)$ for some $x$. Note that $R(x)$ contains at most one of $(u,v)$ and $(v,u)$.
+
+\begin{lem} \label{LPOINTS}
+The integer points of $P^{a,b}(G)$ are the vectors $(x,z) \in \{0,1\}^V \times \{0,1\}^{\Eb}$ such that $z \leq \chi^{R(x)}$. In particular,
+$(x, \mathbf{0}) \in P^{a,b}(G)$ for every $x$, and decreasing a coordinate of $z$ from $1$ to $0$ preserves feasibility.
+\end{lem}
+\begin{proof}
+This is (\ref{EFEAS}), since (\ref{RZ}) holds automatically.
+\end{proof}
+
+\begin{lem} \label{LEXT}
+Let $(s,t) \in \Eb$, $U \subseteq V$ and $\bar{x} \in \{0,1\}^U$. There is $x \in \{0,1\}^V$ with $x|_U = \bar{x}$ and $(s,t) \in R(x)$
+if and only if
+$$|\{ w \in U \cap W_{st} : \bar{x}(w) \neq \chi^{Q_{st}}(w) \}| \leq \kappa_{st}.$$
+In particular, if $\kappa_{st} = 0$, every $x$ that realizes $(s,t)$ coincides with $\chi^{Q_{st}}$ on $W_{st}$.
+\end{lem}
+\begin{proof}
+Every extension $x$ of $\bar{x}$ has $y_{st}(x)$ at least the left-hand side, with equality when $x = \chi^{Q_{st}}$ on
+$W_{st} \backslash U$. Apply Lemma~\ref{LREAL}.
+\end{proof}
+
+By (\ref{EDIFF}), $c(u) - c(v)$ depends only on $x|_{W_{uv}}$, and changing $x(w)$ for one $w \in W_{uv}$ changes it by $\pm\delta$.
+
+\medskip
+
+\noindent\textbf{The two-point method.} We use the following classical characterization (see~\cite{NW88} and~\cite{CMMZ02}).
+
+\begin{thm} \label{TNW}
+Let $P$ be a polytope with minimal equation system $A^= w = b^=$, and let $\pi w \leq \pi_0$ be a valid inequality defining a face $F$
+with $\emptyset \neq F \neq P$. Then $F$ is a facet of $P$ if and only if, for every $(\lambda, \lambda_0)$ such that $\lambda w = \lambda_0$
+for all $w \in F$, there are $u$ and $\alpha$ with $(\lambda, \lambda_0) = (uA^= + \alpha\pi, ub^= + \alpha\pi_0)$.
+\end{thm}
+
+By Proposition~\ref{PDIM}, the minimal equation system of $P^{a,b}(G)$ is $z(e) = 0$, $e \in \Eb \backslash ST$. So, for a valid inequality
+$\pi x + \sigma z \leq \pi_0$ with face $F$, $\emptyset \neq F \neq P^{a,b}(G)$, we must show that every equation $\lambda x + \mu z = \lambda_0$
+satisfied by all points of $F$ has
+\begin{equation} \label{ETARGET}
+\lambda = \alpha \pi \qquad \textrm{and} \qquad \mu_e = \alpha \sigma_e \textrm{ for all } e \in ST
+\end{equation}
+for some $\alpha \in \mathbb{R}$ (the coefficients $\mu_e$, $e \notin ST$, are arbitrary, and $\lambda_0 = \alpha\pi_0$ then follows by evaluating
+at a point of $F$). Each pair of points $p, p' \in F$ gives $(\lambda, \mu) \cdot (p - p') = 0$. Typically:
+\begin{itemize}
+\item if $p' = p + e_{x(r)}$ (the points differ only in $x(r)$), then $\lambda_r = 0$;
+\item if $p' = p + e_{z(f)}$ (the points differ only in $z(f)$), then $\mu_f = 0$.
+\end{itemize}
+For instance, Proposition~\ref{PDIM} follows in this way: for $\pi = \mathbf{0}$ the pairs $(\mathbf{0},\mathbf{0}), (e_r,\mathbf{0})$ give $\lambda_r = 0$, and
+the pairs $(\chi^{Q_{st}}, \mathbf{0}), (\chi^{Q_{st}}, e_{st})$, $(s,t) \in ST$, give $\mu_{st} = 0$, so every equation of $P^{a,b}(G)$ is a combination of
+$z(e) = 0$, $e \in \Eb \backslash ST$.
+Conversely, if all points of $F$ satisfy an equation $\lambda x + \mu z = \lambda_0$ that does not satisfy (\ref{ETARGET}), then $F$ is not
+a facet. We use this in the form: if $z(f) = 0$ on $F$ for some $f \in ST$ with $\sigma_f = 0$, or if $F$ satisfies an equation
+whose $x$-part is not a multiple of $\pi$, then $F$ is not a facet.
+
+\subsection{Bounds}
+
+\begin{thm} \label{TBOUNDS}
+\begin{enumerate}
+\item[(a)] For every $(u,v) \in ST$, the inequality $z(u,v) \geq 0$ defines a facet of $P^{a,b}(G)$.
+\item[(b)] For $r \in V$, the inequality $x(r) \geq 0$ defines a facet if and only if $\kappa_{st} \geq 1$ for every $(s,t) \in ST$
+with $r \in Q_{st}$.
+\item[(c)] For $r \in V$, the inequality $x(r) \leq 1$ defines a facet if and only if $\kappa_{st} \geq 1$ for every $(s,t) \in ST$
+with $r \in P_{st}$.
+\end{enumerate}
+\end{thm}
+\begin{proof}
+(a) Let $F = \{ (x,z) \in P^{a,b}(G) : z(u,v) = 0 \}$. Then $(\mathbf{0},\mathbf{0}) \in F$, and $(\chi^{Q_{uv}}, e_{uv}) \in P^{a,b}(G) \backslash F$ because
+$y_{uv}(\chi^{Q_{uv}}) = 0 \leq \kappa_{uv}$. Let $\lambda x + \mu z = \lambda_0$ hold on $F$.
+\begin{itemize}
+\item For $r \in V$: the points $(\mathbf{0},\mathbf{0})$ and $(e_r, \mathbf{0})$ belong to $F$, so $\lambda_r = 0$.
+\item For $(s,t) \in ST \backslash \{(u,v)\}$: the points $(\chi^{Q_{st}}, \mathbf{0})$ and $(\chi^{Q_{st}}, e_{st})$ belong to $F$, so
+$\mu_{st} = 0$.
+\end{itemize}
+Hence (\ref{ETARGET}) holds with $\alpha = -\mu_{uv}$.
+
+(b) Let $F = \{ (x,z) \in P^{a,b}(G) : x(r) = 0 \}$. Then $(\mathbf{0},\mathbf{0}) \in F$ and $(e_r, \mathbf{0}) \notin F$.
+Assume the condition and let $\lambda x + \mu z = \lambda_0$ hold on $F$.
+\begin{itemize}
+\item For $r' \neq r$: $(\mathbf{0},\mathbf{0}), (e_{r'}, \mathbf{0}) \in F$, so $\lambda_{r'} = 0$.
+\item For $(s,t) \in ST$: apply Lemma~\ref{LEXT} with $U = \{r\}$ and $\bar{x}(r) = 0$. The left-hand side is $1$ if $r \in Q_{st}$
+and $0$ otherwise; in both cases it is at most $\kappa_{st}$. So some $x$ with $x(r) = 0$ realizes $(s,t)$, and
+$(x, \mathbf{0}), (x, e_{st}) \in F$ give $\mu_{st} = 0$.
+\end{itemize}
+Hence (\ref{ETARGET}) holds with $\alpha = -\lambda_r$. Conversely, if $r \in Q_{st}$ and $\kappa_{st} = 0$ for some $(s,t) \in ST$,
+then by Lemma~\ref{LEXT} no $x$ with $x(r) = 0$ realizes $(s,t)$, so $z(s,t) = 0$ on $F$, and $F$ is not a facet.
+
+(c) The same argument with $\bar{x}(r) = 1$ (the left-hand side is $1$ if and only if $r \in P_{st}$), the points $(e_r,\mathbf{0})$ and
+$(e_r + e_{r'}, \mathbf{0})$, and $(\mathbf{0},\mathbf{0}) \notin F$.
+\end{proof}
+
+For $(s,t) \notin ST$ the inequality $z(s,t) \geq 0$ is an implicit equation. The conditions of (b) and (c) fail exactly when fixing
+the label of $r$ forbids some arc.
+
+\begin{cor} \label{CBOUNDS}
+\begin{enumerate}
+\item[(a)] If $(a,b) = (-1,1)$, then $x(r) \geq 0$ and $x(r) \leq 1$ define facets if and only if $r$ has no closed twin.
+\item[(b)] If $(a,b) = (0,1)$, then $x(r) \geq 0$ defines a facet if and only if every neighbor $t$ of $r$ has a neighbor outside $N[r]$,
+and $x(r) \leq 1$ defines a facet if and only if there is no arc $(s,t)$ with $s \in N(r)$, $r \notin N(t)$ and $N(t) \subseteq N[s]$
+(possibly $t = r$).
+\end{enumerate}
+\end{cor}
+\begin{proof}
+(a) Here $\kappa_{st} = 0$ if and only if $s$ and $t$ are closed twins, and then $Q_{st} = \{s\}$, $P_{st} = \{t\}$.
+(b) Here $ST = \Eb$ and $\kappa_{st} = 0$ if and only if $Q_{st} = \{s\}$, \ie $N(t) \subseteq N[s]$. Since $s \in Q_{st}$,
+$r \in Q_{st} = \{s\}$ means $r = s$; and $r \in P_{st}$ means $s \in N(r)$ and $r \notin N(t)$.
+\end{proof}
+
+\subsection{The edge constraints (\ref{RZ})}
+
+At least one of the arcs $(u,v)$ and $(v,u)$ belongs to $ST$: otherwise adding $b|Q_{uv}| \leq a|P_{uv}|$ and $b|P_{uv}| \leq a|Q_{uv}|$
+would give $b|W_{uv}| \leq a|W_{uv}|$. So we may assume $(u,v) \in ST$.
+
+\begin{thm} \label{TRZ}
+Let $uv \in E$ with $(u,v) \in ST$. The inequality $z(u,v) + z(v,u) \leq 1$ defines a facet of $P^{a,b}(G)$ if and only if
+\begin{enumerate}
+\item[(A)] $\kappa_{uv} \geq 1$ or $\kappa_{vu} \geq 1$, and
+\item[(B)] there is no arc $(s,t) \in ST \backslash \{(u,v),(v,u)\}$ with $\kappa_{st} = 0$, $W_{uv} \subseteq W_{st}$ and
+$c(u) = c(v)$ for the labeling $\chi^{Q_{st}}$.
+\end{enumerate}
+\end{thm}
+\begin{proof}
+Let $F$ be the face. Then $(\mathbf{0},\mathbf{0}) \notin F$ and $(\chi^{Q_{uv}}, e_{uv}) \in F$. Assume (A) and (B) and let
+$\lambda x + \mu z = \lambda_0$ hold on $F$. If $\kappa_{uv} \geq 1$, let $e^* = (u,v)$; otherwise $\kappa_{vu} \geq 1$ (so $(v,u) \in ST$) and let
+$e^* = (v,u)$. Let $x^* = \chi^{Q_{e^*}}$.
+\begin{itemize}
+\item \emph{$\lambda_r = 0$ for $r \in V$.} Let $x' = x^* + (1 - 2x^*(r))\,e_r$ be $x^*$ with the label of $r$ changed. Then
+$y_{e^*}(x') \leq 1 \leq \kappa_{e^*}$ (it is $1$ if $r \in W_{uv}$ and $0$ otherwise), so $(x^*, e_{e^*})$ and $(x', e_{e^*})$ belong
+to $F$, and $\lambda_r = 0$.
+\item \emph{$\mu_{st} = 0$ for $(s,t) \in ST \backslash \{(u,v),(v,u)\}$.} It is enough to find $x$ that realizes $(s,t)$ and has
+$c(u) \neq c(v)$: then $R(x)$ contains $e = (u,v)$ or $e = (v,u)$, and the points $(x, e_e)$ and $(x, e_e + e_{st})$ belong to $F$.
+Let $x_0 = \chi^{Q_{st}}$, which realizes $(s,t)$. If $c(u) \neq c(v)$ at $x_0$ we are done. Otherwise, if some $w \in W_{uv}$ is not in $W_{st}$,
+changing the label of $w$ keeps $y_{st} = 0$ and changes $c(u) - c(v)$ by $\pm\delta$. If $W_{uv} \subseteq W_{st}$, then $\kappa_{st} \geq 1$ by (B),
+and changing the label of any $w \in W_{uv}$ gives $y_{st} = 1 \leq \kappa_{st}$ and again changes $c(u) - c(v)$ by $\pm\delta$.
+\item \emph{$\mu_{uv}$ and $\mu_{vu}$.} The point $(\chi^{Q_{uv}}, e_{uv}) \in F$ gives $\mu_{uv} = \lambda_0$, and, if $(v,u) \in ST$, the point
+$(\chi^{P_{uv}}, e_{vu}) \in F$ gives $\mu_{vu} = \lambda_0$.
+\end{itemize}
+Hence (\ref{ETARGET}) holds with $\alpha = \lambda_0$.
+
+Conversely, suppose that (A) fails. Then every point of $F$ realizes $(u,v)$ with $y_{uv} = 0$ or $(v,u)$ with $y_{vu} = 0$, so its $x$ coincides
+on $W_{uv}$ with $\chi^{Q_{uv}}$ or with $\chi^{P_{uv}}$. As $u \in Q_{uv}$ and $v \in P_{uv}$, all points of $F$ satisfy $x(u) + x(v) = 1$, and $F$
+is not a facet. Suppose that (B) fails for $(s,t)$. By Lemma~\ref{LEXT}, every $x$ realizing $(s,t)$ coincides with $\chi^{Q_{st}}$ on
+$W_{st} \supseteq W_{uv}$; since $c(u) - c(v)$ depends only on $x|_{W_{uv}}$, every such $x$ violates $uv$. Hence no point of $F$ has
+$z(s,t) = 1$, and $F$ is not a facet.
+\end{proof}
+
+\begin{cor} \label{CZ1}
+Let $(u,v) \in ST$. The inequality $z(u,v) \leq 1$ defines a facet of $P^{a,b}(G)$ if and only if $(v,u) \notin ST$,
+$\kappa_{uv} \geq 1$ and condition (B) of Theorem~\ref{TRZ} holds.
+\end{cor}
+\begin{proof}
+If $(v,u) \in ST$, every point of the face has $z(v,u) = 0$, so it is not a facet. If $(v,u) \notin ST$, then $z(v,u) = 0$ is an equation of
+$P^{a,b}(G)$, the faces of $z(u,v) \leq 1$ and of (\ref{RZ}) coincide, and (A) reads $\kappa_{uv} \geq 1$.
+\end{proof}
+
+\begin{cor} \label{CRZ}
+If $(a,b) = (-1,1)$, then (\ref{RZ}) defines a facet if and only if $u$ and $v$ are not closed twins.
+\end{cor}
+\begin{proof}
+Condition (A) says that $u$ and $v$ are not closed twins. If $\kappa_{st} = 0$, then $W_{st} = \{s,t\}$, so $W_{uv} \subseteq W_{st}$ forces
+$\{u,v\} = \{s,t\}$, and (B) holds trivially.
+\end{proof}
+
+\subsection{The constraints (\ref{RLABEL})}
+
+By Lemma~\ref{LREAL}, (\ref{RLABEL}) is a proper constraint only when $0 \leq \kappa_{uv} \leq |W_{uv}| - 1$. Its facets are
+characterized in Corollary~\ref{CRLABEL} below, as the case $S = W_{uv}$ of a larger family of valid inequalities.
+
+\section{New valid inequalities}
+
+\subsection{Cover inequalities}
+
+Let $(u,v) \in ST$ and $S \subseteq W_{uv}$, and write $y^S_{uv}(x) = x(S \cap P_{uv}) + |S \cap Q_{uv}| - x(S \cap Q_{uv})$ for the
+number of defects inside $S$. If $|S| \geq \kappa_{uv} + 1$, the \emph{cover inequality} is
+\begin{equation} \label{RCOV}
+y^S_{uv}(x) + (|S| - \kappa_{uv})\, z(u,v) \leq |S|, \qquad \textrm{\ie} \qquad
+x(S \cap P_{uv}) - x(S \cap Q_{uv}) + (|S| - \kappa_{uv})\, z(u,v) \leq |S \cap P_{uv}|.
+\end{equation}
+It is valid: if $z(u,v) = 0$ it says $y^S_{uv}(x) \leq |S|$, and if $z(u,v) = 1$ then $y^S_{uv}(x) \leq y_{uv}(x) \leq \kappa_{uv}$ by
+Lemma~\ref{LREAL}. For $S = W_{uv}$ it is (\ref{RLABEL}), by Lemma~\ref{LREAL}. The family contains every strengthening of (\ref{RLABEL}) that
+involves only $x$ and $z(u,v)$:
+
+\begin{prop} \label{PHULL}
+Let $(u,v) \in \Eb$ with $0 \leq \kappa_{uv} < |W_{uv}|$, and let $Y = \{ (x,z) \in \{0,1\}^{W_{uv}} \times \{0,1\} : z = 1 \Rightarrow y_{uv}(x) \leq \kappa_{uv} \}$.
+Then $\mathrm{conv}(Y)$ is described by the bounds $0 \leq x \leq 1$, $0 \leq z \leq 1$ and the cover inequalities (\ref{RCOV}) for all
+$S \subseteq W_{uv}$ with $|S| \geq \kappa_{uv}+1$.
+\end{prop}
+\begin{proof}
+Complementing the variables of $Q_{uv}$ we may assume $Q_{uv} = \emptyset$, so $y_{uv}(x) = x(W)$ with $W = W_{uv}$, and we write $\kappa = \kappa_{uv}$.
+Then $\mathrm{conv}(Y) = \mathrm{conv}(Y_0 \cup Y_1)$ with $Y_0 = [0,1]^W \times \{0\}$ and $Y_1 = \{ x \in [0,1]^W : x(W) \leq \kappa \} \times \{1\}$
+(both are integral polytopes). Let $(x,z)$ satisfy the bounds and all covers. If $z \in \{0,1\}$ the claim is clear (for $z = 1$, take
+$S = W$). Otherwise, $(x,z) = (1-z)(x^0, 0) + z(x^1, 1)$ with $x^0, x^1 \in [0,1]^W$ if and only if
+$\max(0, (x_w - 1 + z)/z) \leq x^1_w \leq \min(1, x_w/z)$ for all $w$; these intervals are nonempty. Such an $x^1$ with $x^1(W) \leq \kappa$
+exists if and only if $\sum_w \max(0, x_w + z - 1) \leq \kappa z$. The left-hand side equals $\max_{S \subseteq W} (x(S) + |S|z - |S|)$, so the
+condition says $x(S) + (|S| - \kappa) z \leq |S|$ for all $S$, which holds by the covers (and by the bounds when $|S| \leq \kappa$).
+\end{proof}
+
+To state when (\ref{RCOV}) defines a facet of $P^{a,b}(G)$, for arcs $e = (u,v)$ and $f = (s,t)$ let
+$$A_{ef} = (P_{uv} \cap P_{st}) \cup (Q_{uv} \cap Q_{st}), \qquad D_{ef} = (P_{uv} \cap Q_{st}) \cup (Q_{uv} \cap P_{st}),$$
+the vertices of $W_{uv} \cap W_{st}$ on the same side and on opposite sides. So a defect for $e$ at a vertex of $A_{ef}$ is also a defect for $f$,
+and a defect for $e$ at a vertex of $D_{ef}$ is not.
+
+\begin{thm} \label{TCOV}
+Let $e = (u,v) \in ST$, $\kappa = \kappa_{uv}$ and $S \subseteq W_{uv}$ with $|S| \geq \kappa + 1$. The cover inequality (\ref{RCOV})
+defines a facet of $P^{a,b}(G)$ if and only if
+\begin{enumerate}
+\item[(A$_S$)] $\kappa \geq 1$ or $|S| = 1$, and
+\item[(B$_S$)] for every $f = (s,t) \in ST \backslash \{e\}$, either $|S \cap A_{ef}| \leq \kappa_{st}$, or $f \neq (v,u)$ and
+$$|D_{ef}| - \min(\kappa, |S \cap D_{ef}|) + \max(0, \kappa - |S \cap D_{ef}| - |S \backslash W_{st}|) \leq \kappa_{st}.$$
+\end{enumerate}
+\end{thm}
+\begin{proof}
+Let $F$ be the face. By Lemma~\ref{LPOINTS}, an integer point $(x,z) \in P^{a,b}(G)$ lies in $F$ if and only if it is of one of two types:
+\begin{itemize}
+\item \emph{type 0}: $z(u,v) = 0$ and $y^S_{uv}(x) = |S|$, \ie $x = \chi^{P_{uv}}$ on $S$;
+\item \emph{type 1}: $z(u,v) = 1$ and $y^S_{uv}(x) = \kappa$. Since $\kappa = y^S_{uv}(x) \leq y_{uv}(x) \leq \kappa$, this means that
+$x = \chi^{Q_{uv} \triangle T}$ on $W_{uv}$ for some $T \subseteq S$ with $|T| = \kappa$ (the defects are exactly at $T$).
+\end{itemize}
+In both cases the remaining labels and the remaining coordinates of $z$ are arbitrary, subject to $z \leq \chi^{R(x)}$. The point
+$(\chi^{Q_{uv}}, \mathbf{0})$ has $y^S_{uv} = 0 < |S|$, so $F \neq P^{a,b}(G)$; and $F \neq \emptyset$.
+
+\emph{The existence of points with $z(f) = 1$.} Let $f = (s,t) \in ST \backslash \{e\}$. By Lemma~\ref{LEXT} with $U = S$, there is a point
+of type 0 realizing $f$ if and only if $|S \cap A_{ef}| \leq \kappa_{st}$ (on $S$ the labeling is $\chi^{P_{uv}}$, which differs from $\chi^{Q_{st}}$ exactly
+on $S \cap A_{ef}$). If $f = (v,u)$ there is no point of type 1 with $z(f) = 1$, and $A_{ef} = \emptyset$. Otherwise, by Lemma~\ref{LEXT} with
+$U = W_{uv}$, there is a point of type 1 with defect set $T$ realizing $f$ if and only if $|D_{ef} \backslash T| + |T \cap A_{ef}| \leq \kappa_{st}$.
+To minimize the left-hand side over $T \subseteq S$ with $|T| = \kappa$, take first the elements of $S \cap D_{ef}$, then those of $S \backslash W_{st}$,
+and only then those of $S \cap A_{ef}$; the minimum is the left-hand side of the inequality in (B$_S$). Therefore (B$_S$) holds if and only if
+for every $f \in ST \backslash \{e\}$ some point of $F$ has $z(f) = 1$.
+
+\emph{Sufficiency.} Assume (A$_S$) and (B$_S$) and let $\lambda x + \mu z = \lambda_0$ hold on $F$. For $w \in W_{uv}$ let
+$\tilde{\lambda}_w = \lambda_w$ if $w \in P_{uv}$ and $\tilde{\lambda}_w = -\lambda_w$ if $w \in Q_{uv}$; so creating a defect at $w$ changes $\lambda x$ by
+$\tilde{\lambda}_w$.
+\begin{itemize}
+\item \emph{$\lambda_r = 0$ for $r \notin S$.} Let $x$ be of type 0. Then $(x, \mathbf{0})$ and $(x', \mathbf{0})$ belong to $F$, where $x'$ is $x$ with the label of
+$r$ changed.
+\item \emph{$\mu_f = 0$ for $f \in ST \backslash \{e\}$.} Take $(x, z) \in F$ with $z(f) = 1$. Then $(x, z - e_f) \in F$.
+\item \emph{$\tilde{\lambda}$ is constant on $S$.} There is nothing to prove if $|S| = 1$. Otherwise $1 \leq \kappa \leq |S| - 1$ by (A$_S$). For
+$r, r' \in S$ choose $T \subseteq S$ with $|T| = \kappa$, $r \in T$ and $r' \notin T$, and let $T' = (T \backslash \{r\}) \cup \{r'\}$. The two points of type 1
+with defect sets $T$ and $T'$, both $\mathbf{0}$ outside $W_{uv}$ and with $z = e_{uv}$, differ only in the labels of $r$ and $r'$, so
+$\tilde{\lambda}_r - \tilde{\lambda}_{r'} = 0$. Let $\theta$ be the common value.
+\item \emph{$\mu_{uv} = \theta(|S| - \kappa)$.} Fix $T \subseteq S$ with $|T| = \kappa$. Let $x^1 = \chi^{Q_{uv} \triangle T}$ on $W_{uv}$ and $\mathbf{0}$ elsewhere,
+and let $x^0$ be $x^1$ with defects also on $S \backslash T$. Then $(x^0, \mathbf{0})$ is of type 0 and $(x^1, e_{uv})$ is of type 1, so
+$\lambda x^0 = \lambda_0 = \lambda x^1 + \mu_{uv}$, and $\lambda x^0 - \lambda x^1 = \sum_{w \in S \backslash T} \tilde{\lambda}_w = \theta(|S| - \kappa)$.
+\end{itemize}
+Since the coefficient of $x(w)$ in (\ref{RCOV}) is $1$ for $w \in S \cap P_{uv}$ and $-1$ for $w \in S \cap Q_{uv}$, (\ref{ETARGET}) holds with
+$\alpha = \theta$.
+
+\emph{Necessity.} If (B$_S$) fails for $f$, then $z(f) = 0$ on $F$, and $F$ is not a facet. If (A$_S$) fails, then $\kappa = 0$ and $|S| \geq 2$, so
+the points of type 1 have no defects on $W_{uv}$, and those of type 0 have defects at every vertex of $S$. For distinct $r, r' \in S$, every point of
+$F$ thus has a defect at both or at neither, \ie it satisfies $\pm x(r) \mp x(r') = $ constant (with the signs given by the sides of $r$ and $r'$).
+This equation has no $z$-terms and a nonzero $x$-part that is not a multiple of the $x$-part of (\ref{RCOV}), so $F$ is not a facet.
+\end{proof}
+
+\begin{cor} \label{CRLABEL}
+Let $(u,v) \in ST$ with $\kappa_{uv} \leq |W_{uv}| - 1$. Constraint (\ref{RLABEL}) defines a facet of $P^{a,b}(G)$ if and only if
+$\kappa_{uv} \geq 1$ and (B$_S$) holds for $S = W_{uv}$. If $\kappa_{uv} = 0$, (\ref{RLABEL}) is the sum of the $|W_{uv}|$ cover inequalities with
+$|S| = 1$:
+$$z(u,v) \leq x(w)~~(w \in Q_{uv}), \qquad z(u,v) \leq 1 - x(w)~~(w \in P_{uv}).$$
+\end{cor}
+
+For example, if $u$ and $v$ are closed twins, then $W_{uv} = \{u,v\}$, $c(u) - c(v) = \ell(v) - \ell(u)$ and $\kappa_{uv} = \lceil (b-a)/\delta \rceil - 1 = 0$
+for every $a < b$. The covers are $z(u,v) \leq x(u)$ and $z(u,v) \leq 1 - x(v)$: $c(u) < c(v)$ forces $\ell(u) = b$ and $\ell(v) = a$. For
+$(a,b) = (-1,1)$ these are the only arcs with $\kappa_{uv} = 0$; for $(a,b) = (0,1)$, $\kappa_{uv} = 0$ if and only if $N(v) \subseteq N[u]$.
+
+The covers with $S \neq W_{uv}$ really cut off fractional points of the linear relaxation. If $\kappa_{uv} = 1$ and $|W_{uv}| = 3$, then the point with
+defects on two vertices $S$ of $W_{uv}$, no defect on the third one, and $z(u,v) = 1/2$ satisfies (\ref{RLABEL}) ($2 + 2 \cdot \frac12 = 3$) but
+violates the cover $y^S_{uv}(x) + z(u,v) \leq 2$.
+
+\subsection{Conflict inequalities}
+
+A \emph{conflict clique} is a nonempty set $C \subseteq ST$ such that no two arcs of $C$ are realizable together, \ie
+$|C \cap R(x)| \leq 1$ for every $x$. Then
+\begin{equation} \label{RCLQ}
+\sum_{e \in C} z(e) \leq 1
+\end{equation}
+is valid. Constraint (\ref{RZ}) is the case $C = \{(u,v),(v,u)\}$ and $z(u,v) \leq 1$ is the case $|C| = 1$.
+
+\begin{thm} \label{TCLQ}
+Let $C$ be a conflict clique. Then (\ref{RCLQ}) defines a facet of $P^{a,b}(G)$ if and only if
+\begin{enumerate}
+\item[(K1)] for every $r \in V$ there is $e \in C$ with $r \notin W_e$ or $\kappa_e \geq 1$, and
+\item[(K2)] for every $f \in ST \backslash C$ there is $e \in C$ such that $\{e,f\}$ is realizable.
+\end{enumerate}
+\end{thm}
+\begin{proof}
+Let $F$ be the face; it consists of the integer points with exactly one $z(e) = 1$, $e \in C$. Then $(\mathbf{0},\mathbf{0}) \notin F$ and
+$(\chi^{Q_e}, e_e) \in F$ for $e \in C$. Assume (K1), (K2), and let $\lambda x + \mu z = \lambda_0$ hold on $F$.
+\begin{itemize}
+\item \emph{$\lambda_r = 0$.} Take $e \in C$ as in (K1) and let $x'$ be $\chi^{Q_e}$ with the label of $r$ changed. Then $y_e(x') \leq \kappa_e$, so
+$(\chi^{Q_e}, e_e)$ and $(x', e_e)$ belong to $F$.
+\item \emph{$\mu_f = 0$ for $f \in ST \backslash C$.} Take $e$ as in (K2) and $x$ realizing $\{e,f\}$; then $(x, e_e)$ and $(x, e_e + e_f)$ belong
+to $F$.
+\item \emph{$\mu_e = \lambda_0$ for $e \in C$}, from the point $(\chi^{Q_e}, e_e)$.
+\end{itemize}
+So (\ref{ETARGET}) holds with $\alpha = \lambda_0$. Conversely, if (K2) fails for $f$, then $z(f) = 0$ on $F$. If (K1) fails for $r$, then for every
+$e \in C$ we have $r \in W_e$ and $\kappa_e = 0$, so by Lemma~\ref{LEXT} every $x$ realizing $e$ has $x(r) = \chi^{Q_e}(r)$. Hence $F$ satisfies the equation
+$x(r) = \sum_{e \in C} \chi^{Q_e}(r)\, z(e)$, whose $x$-part is not zero. In both cases $F$ is not a facet.
+\end{proof}
+
+For $C = \{(u,v),(v,u)\}$, (K1) is condition (A) of Theorem~\ref{TRZ} and (K2) is condition (B), in the explicit form proved there.
+More generally, if $C$ is a nonrealizable set such that $C \backslash \{e\}$ is realizable for every $e \in C$, then the \emph{circuit inequality}
+\begin{equation} \label{RCIRC}
+\sum_{e \in C} z(e) \leq |C| - 1
+\end{equation}
+is valid.
+
+\begin{thm} \label{TCIRC}
+Let $C$ be as above, with $|C| \geq 2$. Inequality (\ref{RCIRC}) defines a facet of $P^{a,b}(G)$ if
+\begin{enumerate}
+\item[(C1)] for every $r \in V$ there are $e \in C$ and $x$ such that both $x$ and $x$ with the label of $r$ changed realize $C \backslash \{e\}$, and
+\item[(C2)] for every $f \in ST \backslash C$ there is $e \in C$ such that $(C \backslash \{e\}) \cup \{f\}$ is realizable.
+\end{enumerate}
+Condition (C2) is also necessary.
+\end{thm}
+\begin{proof}
+The face $F$ consists of the integer points with $z(e) = 1$ for all but one $e \in C$. (C1) gives $\lambda_r = 0$ and (C2) gives $\mu_f = 0$, exactly as in
+Theorem~\ref{TCLQ}. For $e \in C$, a point $(x, \chi^{C \backslash \{e\}}) \in F$ gives $\mu(C) - \mu_e = \lambda_0$, so all $\mu_e$, $e \in C$, are equal
+to some $\theta$, and (\ref{ETARGET}) holds with $\alpha = \theta$. If (C2) fails for $f$, then $z(f) = 0$ on $F$.
+\end{proof}
+
+For $|C| = 2$ the circuit and clique inequalities coincide, and (C1) is (K1). For $|C| \geq 3$, (C1) is not necessary: on small random graphs,
+between $10\%$ and $20\%$ of the facet-defining circuit inequalities with $|C| = 3$ violate it.
+
+\subsection{Sources of conflicts}
+
+The following lemma gives a simple sufficient condition for an arc set to be nonrealizable. For vertices $p, q$ (adjacent or not), the
+same argument as in (\ref{EST}) shows that
+\begin{equation} \label{EMAX}
+\max_{x} \bigl( c(p) - c(q) \bigr) = b\,|N(p) \backslash N(q)| - a\,|N(q) \backslash N(p)|.
+\end{equation}
+We write $p \preceq q$ (\emph{$q$ dominates $p$}) if this maximum is at most $0$, \ie $c(p) \leq c(q)$ for every labeling. For adjacent $s, t$,
+$(s,t) \notin ST$ if and only if $t \preceq s$. If $a \geq 0$, then $N(p) \subseteq N(q)$ implies $p \preceq q$. If $a < 0$ this is false in general,
+but false twins ($N(p) = N(q)$) always satisfy $p \preceq q$ and $q \preceq p$.
+
+\begin{prop} \label{PGAP}
+Let $(s_1,t_1), \ldots, (s_k,t_k) \in \Eb$, $k \geq 1$, with indices modulo $k$. Let
+$h_i = \max_x (c(t_i) - c(s_{i+1}))$, given by (\ref{EMAX}) (with $h_i = 0$ if $t_i = s_{i+1}$), and let $g_i$ be the least positive integer
+congruent to $a\,(d(t_i) - d(s_i))$ modulo $\delta$. If $\sum_i g_i > \sum_i h_i$, then $\{(s_1,t_1), \ldots, (s_k,t_k)\}$ is not realizable, and
+$\sum_{i=1}^k z(s_i,t_i) \leq k - 1$ is valid.
+\end{prop}
+\begin{proof}
+Since $c(w) = a\,d(w) + \delta\,x(N(w))$, the difference $c(t_i) - c(s_i)$ is congruent to $a(d(t_i) - d(s_i))$ modulo $\delta$, so it is at least $g_i$
+whenever it is positive. If some $x$ realized all the arcs, the telescoping identity
+$0 = \sum_i \bigl(c(t_i) - c(s_i)\bigr) + \sum_i \bigl(c(s_{i+1}) - c(t_i)\bigr) \geq \sum_i g_i - \sum_i h_i$ would give a contradiction.
+\end{proof}
+
+Since $g_i \geq 1$, the hypothesis holds whenever $t_i \preceq s_{i+1}$ for all $i$ (\emph{dominance cycles}). Special cases:
+\begin{itemize}
+\item $k = 2$, $(s_2,t_2) = (t_1,s_1)$: constraint (\ref{RZ}).
+\item Directed cycles $t_i = s_{i+1}$: the cycle inequalities $\sum_{i=1}^k z(v_i, v_{i+1}) \leq k - 1$ for a closed walk
+$v_1 v_2 \cdots v_k v_1$.
+\item \emph{2-chains}: $(u,w), (w,v)$ with $u \neq v$ and $v \preceq u$, which give $z(u,w) + z(w,v) \leq 1$. If $a \geq 0$ this applies whenever $N(v) \subseteq N(u)$. For $a < 0$ the
+inclusion is not enough, but $N(u) = N(v)$ is.
+\item The induced $P_4$ $u'vv'u$ with $u \preceq v$ and $u' \preceq v'$: arcs $(v',u)$ and $(v,u')$, giving $z(v',u) + z(v,u') \leq 1$.
+\item \emph{Gaps}: for $(a,b) = (0,1)$ all $g_i = 1$, so a 2-chain $(u,w),(w,v)$ is a conflict as soon as $|N(v) \backslash N(u)| \leq 1$. For example,
+in the path $0\,1\,2\,3$, $z(3,2) + z(2,1) \leq 1$ is a facet, although $1 \not\preceq 3$.
+\item \emph{Closed twins}: if $u, v, w$ are pairwise closed twins, then $c(p) = \ell(N[u]) - \ell(p)$ for $p \in \{u,v,w\}$ takes only two values,
+so any two of the arcs $(u,v), (v,w), (w,u)$ form a nonrealizable 2-chain, and $z(u,v) + z(v,w) + z(w,u) \leq 1$ is a conflict clique of size 3.
+\end{itemize}
+In all these cases the facet conditions are those of Theorems~\ref{TCLQ} and~\ref{TCIRC}. For a 2-chain $C = \{(u,w),(w,v)\}$, (K1) says
+that $\max(\kappa_{uw}, \kappa_{wv}) \geq 1$ whenever $W_{uw} \cap W_{wv} \neq \emptyset$. For instance, in $K_3$ both directed triangles define facets.
+
+\subsection{Conditional conflicts and the linear relaxation}
+
+Fixing some labels creates more conflicts. If $C \subseteq \Eb$ and $U_0, U_1 \subseteq V$ are disjoint sets such that $C$ is not realized by any
+$x$ with $x|_{U_0} = 0$ and $x|_{U_1} = 1$, then
+\begin{equation} \label{RCOND}
+\sum_{e \in C} z(e) \leq |C| - 1 + x(U_0) + |U_1| - x(U_1)
+\end{equation}
+is valid, since the right-hand side is at least $|C|$ outside that subcube. The covers with $|S| = \kappa_{uv} + 1$ are the case $|C| = 1$. In
+the small graphs we enumerated, many facets have this form. For example, for the paw (a triangle $0\,1\,2$ with a pendant vertex $3$ at $2$) and
+$(a,b) = (-1,1)$, the inequality $z(1,2) + z(2,0) \leq 1 + x(1)$ defines a facet. Even richer facets exist, \eg
+$x(0) - x(2) + z(1,0) + z(2,0) + z(2,1) \leq 1$ for $K_3$. Characterizing the facets of (\ref{RCOND}) is left open.
+
+The following observation explains why the cliques matter most for the lower bound.
+
+\begin{prop} \label{PHALF}
+Assume $ST = \Eb$ (\eg $a \leq 0 \leq b$). The point $x = \frac12 \mathbf{1}$, $z = \frac12 \mathbf{1}$ satisfies (\ref{RLABEL}), (\ref{RZ}), all
+bounds, all cover inequalities, all circuit inequalities, and all inequalities (\ref{RCOND}) with $|C| \geq 2$ or $U_0 \cup U_1 \neq \emptyset$. Its
+objective value is $0$.
+\end{prop}
+\begin{proof}
+For a cover, $\frac{|S|}{2} + \frac{|S| - \kappa_{uv}}{2} \leq |S|$ since $\kappa_{uv} \geq 0$; (\ref{RLABEL}) is the case $S = W_{uv}$. For a circuit,
+$\frac{|C|}{2} \leq |C| - 1$ when $|C| \geq 2$. For (\ref{RCOND}), $\frac{|C|}{2} \leq |C| - 1 + \frac{|U_0| + |U_1|}{2}$ under the stated hypothesis.
+Finally, $|E| - \sum_{e} z(e) = |E| - \frac12 \cdot 2|E| = 0$.
+\end{proof}
+
+Therefore, when $ST = \Eb$, the linear relaxation, even strengthened with all covers, all 2-conflicts and all circuits, always gives the trivial bound $0$. Only conflict
+cliques with $|C| \geq 3$ (and inequalities with mixed $x$- and $z$-terms) cut off this point, since $\frac{|C|}{2} > 1$. On small examples the cliques
+close the gap: with all maximal conflict cliques the bound is $\eta_v^{a,b}(G)$ for $K_3$ (value $1$), $K_4$ ($2$) and $W_3$ ($2$), for
+$(a,b) \in \{(0,1),(-1,1),(1,2)\}$. For the net and the bowtie with $(a,b) = (-1,1)$, and for $C_5$, the bound stays $0$ while
+$\etav(G) = 1$: there the obstruction is global, as the Nullstellensatz certificate of Section~\ref{SNULL} shows for the net.
+
+\section{Symmetries} \label{SSYM}
+
+A \emph{symmetry} is an affine bijection of $\mathbb{R}^V \times \mathbb{R}^{\Eb}$ that maps the integer points of $P^{a,b}(G)$ onto themselves and preserves the
+objective function $|E| - \sum_e z(e)$.
+
+\begin{prop} \label{PSYM}
+\begin{enumerate}
+\item[(a)] Every automorphism $\pi$ of $G$ induces the symmetry $(x,z) \mapsto (x \circ \pi^{-1}, z \circ \pi^{-1})$, where
+$(z \circ \pi^{-1})(u,v) = z(\pi^{-1}(u), \pi^{-1}(v))$.
+\item[(b)] If $a + b = 0$, or if $G$ is regular, then $\rho(x,z) = (\mathbf{1} - x, z^T)$, where $z^T(u,v) = z(v,u)$, is a symmetry.
+\item[(c)] If $u$ and $u'$ are false twins, exchanging $x(u)$ and $x(u')$ and keeping $z$ is a symmetry.
+\end{enumerate}
+\end{prop}
+\begin{proof}
+(a) Colors are carried along: $c_{x \circ \pi^{-1}}(\pi(v)) = c_x(v)$, so $R(x \circ \pi^{-1}) = \pi(R(x))$. Apply Lemma~\ref{LPOINTS}.
+(b) $\mathbf{1} - x$ encodes $\ell' = (a + b) - \ell$, with colors $c'(v) = (a+b)\,d(v) - c(v)$. If $(a+b)(d(u) - d(v)) = 0$ for every edge $uv$, then
+$c'(u) < c'(v)$ if and only if $c(v) < c(u)$, so $R(\mathbf{1} - x) = R(x)^T$.
+(c) $N(w)$ contains both or neither of $u, u'$ for every $w$, so all colors are unchanged, and so is $R(x)$.
+\end{proof}
+
+For $b = -a$ the map $\rho$ is $\ell \mapsto -\ell$; in general it is the identity $\etav = \eta_v^{-b,-a}$ followed by the shift
+$\ell \mapsto \ell + a + b$, which preserves the order of the colors only along edges whose endpoints have equal degrees.
+
+\medskip
+
+\noindent\textbf{Symmetry-breaking inequalities.} Let $\Gamma$ be the group generated by the symmetries of Proposition~\ref{PSYM}(a), and by $\rho$
+when it applies. Fix an order $v_1, \ldots, v_n$ of $V$ and compare labelings lexicographically in this order. Each $\Gamma$-orbit of integer points
+contains a point whose $x$ is lexicographically maximal in the orbit (a \emph{lex-leader}). As the objective is $\Gamma$-invariant, adding
+inequalities satisfied by all lex-leaders does not change the optimal value. For $i \geq 1$, let $\mathrm{Aut}_i$ be the subgroup of automorphisms
+fixing $v_1, \ldots, v_{i-1}$ (so $\mathrm{Aut}_1 = \mathrm{Aut}(G)$).
+
+\begin{thm} \label{TSB}
+Every lex-leader satisfies
+\begin{equation} \label{RORB}
+x(v_i) \geq x(w) \qquad \textrm{for all } i \textrm{ and all } w \textrm{ in the orbit of } v_i \textrm{ under } \mathrm{Aut}_i.
+\end{equation}
+If $\rho$ is a symmetry, every lex-leader also satisfies
+\begin{equation} \label{RRHO}
+x(v_1) = 1 \qquad \textrm{and} \qquad x(v_2) + x(\pi(v_1)) + x(\pi(v_2)) \geq 1 \quad \textrm{for all } \pi \in \mathrm{Aut}(G).
+\end{equation}
+Therefore $\min \{ |E| - \sum_e z(e) : (x,z) \in P^{a,b}(G) \cap \Z^{V \cup \Eb} \textrm{ satisfies (\ref{RORB}) and (\ref{RRHO})} \} = \etav(G)$.
+\end{thm}
+\begin{proof}
+Let $(x,z)$ be a lex-leader. For $\pi \in \mathrm{Aut}_i$, the labeling $x \circ \pi^{-1}$ agrees with $x$ on $v_1, \ldots, v_{i-1}$, so
+$x \geq_{\mathrm{lex}} x \circ \pi^{-1}$ gives $x(v_i) \geq x(\pi^{-1}(v_i))$, and $\pi^{-1}(v_i)$ runs over the orbit. If $\rho$ is a symmetry,
+$x \geq_{\mathrm{lex}} \mathbf{1} - x$ forces $x(v_1) = 1$. For $\pi \in \mathrm{Aut}(G)$, compare $x$ with $y = \mathbf{1} - x \circ \pi^{-1}$, the image under
+$\rho$ composed with the symmetry induced by $\pi$. If $x(\pi^{-1}(v_1)) = 0$ then $y(v_1) = 1 = x(v_1)$, so $x(v_2) \geq y(v_2) = 1 - x(\pi^{-1}(v_2))$.
+In all cases $x(v_2) + x(\pi^{-1}(v_1)) + x(\pi^{-1}(v_2)) \geq 1$, and $\pi^{-1}$ runs over $\mathrm{Aut}(G)$.
+\end{proof}
+
+Twins are the main source of automorphisms. If $\{c_1, \ldots, c_m\}$ is a class of pairwise (false or closed) twins listed in this order, every
+transposition of the class is an automorphism, and (\ref{RORB}) contains the chain
+$$x(c_1) \geq x(c_2) \geq \cdots \geq x(c_m).$$
+For a false-twin class this merely chooses which vertices of the class carry the label $b$; only their number matters, since the class
+members have the same neighbors. For a closed-twin class, the chain combines with the covers $z(c_i, c_j) \leq x(c_i)$ and
+$z(c_i, c_j) \leq 1 - x(c_j)$ (Corollary~\ref{CRLABEL}): for $i > j$ they force $z(c_i,c_j) = 0$, since $x(c_i) = 1$ implies $x(c_j) = 1$. Choosing $v_1$ in a large orbit makes (\ref{RORB}) strongest. For instance, for $W_k$ with $v_1 \in A$, the orbit of $v_1$ is $A \cup B$.
+
+\medskip
+
+\noindent\textbf{Optimality-based inequalities.} The symmetry-breaking inequalities can be combined with the following equations and inequalities,
+which hold for \emph{every} optimal solution (they are not valid for $P^{a,b}(G)$).
+
+\begin{prop} \label{POPT}
+Every optimal integer solution $(x,z)$ satisfies $z = \chi^{R(x)}$. Consequently, if $v \preceq u$ and $w \in N(u) \cap N(v)$, then
+$z(v,w) \geq z(u,w)$ and $z(w,u) \geq z(w,v)$. In particular, for false twins $u, u'$ and $w \in N(u)$: $z(u,w) = z(u',w)$ and $z(w,u) = z(w,u')$.
+\end{prop}
+\begin{proof}
+By Lemma~\ref{LPOINTS}, raising $z(e)$ to $1$ for a realized arc $e$ keeps feasibility and lowers the objective, so $z = \chi^{R(x)}$ at an optimum. If
+$c(u) < c(w)$, then $c(v) \leq c(u) < c(w)$, and if $c(w) < c(v)$, then $c(w) < c(v) \leq c(u)$.
+\end{proof}
+
+Since some lex-leader is optimal, the problem keeps its optimal value when (\ref{RORB}), (\ref{RRHO}) and the constraints of Proposition~\ref{POPT} are
+all added. In a sample of 117 random instances with at most $7$ vertices (most of them with $b = -a$, so that $\rho$ applies), (\ref{RORB}) and (\ref{RRHO})
+remove about $63\%$ of the integer points.
+Added to the formulation alone, they do not raise the bound of the linear relaxation in our examples (it stays $0$). Together with the covers and
+the 2-element conflict cliques they do: the bound becomes $1 = \etav(K_3)$ for $K_3$ and $1.5$ for $K_4$ (where $\etav(K_4) = 2$), for each
+$(a,b) \in \{(0,1),(-1,1),(1,2)\}$.
+
+\medskip
+
+\noindent\textbf{Interchangeable blocks.} Suppose $B_1, \ldots, B_k$ are disjoint vertex sets with bijections $\varphi_j : B_1 \to B_j$ such that, for every
+permutation $\sigma$ of $\{1, \ldots, k\}$, the map $\varphi_j(i) \mapsto \varphi_{\sigma(j)}(i)$ (identity outside the blocks) is an automorphism, \eg
+$k$ copies of a rooted graph attached to a common vertex. Twin classes are the case $|B_1| = 1$. Read the labels of block $j$ as a word
+$\omega_j \in \{0,1\}^{B_1}$ and fix a total order $p_1 < p_2 < \cdots < p_{2^m}$ of the words, $m = |B_1|$. On its own (\ie with an order of $V$ that is not used for (\ref{RORB})), sorting the blocks, \ie requiring
+$\omega_1 \leq \omega_2 \leq \cdots \leq \omega_k$, is symmetry breaking. With pattern variables $\omega(p,j) \in \{0,1\}$, $\sum_p \omega(p,j) = 1$
+and $x(\varphi_j(i)) = \sum_{p : p_i = 1} \omega(p,j)$, it can be written as
+$$\sum_{q \leq p} \omega(q, j+1) \leq \sum_{q \leq p} \omega(q, j) \qquad \textrm{for all } p \textrm{ and } j = 1, \ldots, k-1.$$
+In the cumulative variables $\Omega(p,j) = \sum_{q \leq p} \omega(q,j)$ every constraint has the form $\Omega \leq \Omega'$ or fixes $\Omega$ to $1$, so the
+matrix is totally unimodular and these constraints describe the convex hull of the sorted pattern matrices. The pattern matrix has exactly one $1$ per
+column and the group permutes its columns, so it is not a packing or partitioning orbitope in the sense of Kaibel and Pfetsch~\cite{KP08}, where each
+row has at most one $1$. Here the order allows repetitions, since two blocks may carry the same word. This is an extended formulation with
+$2^m k$ variables, so it is useful only for small blocks.
+
+\section{A Nullstellensatz certificate for the net} \label{SNULL}
+
+Let $D = (V,A)$ be an orientation of $G$ and consider the additive graph polynomial
+$$q_D(x) = \prod_{(i,j) \in A} \bigl( x(N(j)) - x(N(i)) \bigr) \in \Z[x_v : v \in V].$$
+An $(a,b)$-labeling $\ell$ is an $(a,b)$-additive coloring if and only if $q_D(\ell) \neq 0$. Hence
+$\etav(G) > 0$ if and only if $q_D$ vanishes on the grid $\{a,b\}^V$.
+
+\begin{lem}[Grid reduction] \label{LGRID}
+Let $\mathbb{F}$ be a field, $a \neq b$ in $\mathbb{F}$ and $g_v = (x_v - a)(x_v - b)$ for $v \in V$. Every
+$f \in \mathbb{F}[x]$ can be written as $f = \sum_{v} h_v g_v + \bar{f}$ with $\bar{f}$ multilinear, and $\bar{f}$ is the unique
+multilinear polynomial that agrees with $f$ on $\{a,b\}^V$. In particular, $f$ vanishes on $\{a,b\}^V$ if and only if $\bar{f} = 0$,
+if and only if $f \in \langle g_v : v \in V \rangle$.
+\end{lem}
+\begin{proof}
+Replacing repeatedly $x_v^2$ by $(a+b)x_v - ab$ yields $\bar{f}$, and $f - \bar{f} \in \langle g_v \rangle$ vanishes on the grid.
+A multilinear polynomial vanishing on $\{a,b\}^V$ is zero: write it as $p_0 + x_v p_1$ with $p_0, p_1$ free of $x_v$; then
+$p_0 + a p_1$ and $p_0 + b p_1$ vanish on the grid of the remaining variables, so by induction $p_0 + ap_1 = p_0 + bp_1 = 0$, and
+$p_1 = p_0 = 0$ since $a \neq b$. This gives uniqueness, and the last equivalence follows. (This is the grid lemma behind Alon's
+Combinatorial Nullstellensatz~\cite{Alon99}.)
+\end{proof}
+
+The reduction can be performed with $a$ and $b$ as indeterminates. Indeed, $x^e \equiv \alpha_e x + \beta_e \pmod{(x-a)(x-b)}$, where
+$$\alpha_e = \frac{a^e - b^e}{a - b}, \qquad \beta_e = \frac{a\,b^e - b\,a^e}{a - b}$$
+belong to $\Z[a,b]$. Replacing every power $x_v^e$ of every monomial of $q_D$ by $\alpha_e x_v + \beta_e$ gives a multilinear
+polynomial $R_D \in \Z[a,b][x]$ such that, for all $a_0 \neq b_0$, the specialization $R_D(a_0,b_0;x)$ is the reduction of $q_D$ of
+Lemma~\ref{LGRID}. Therefore, for integers $a < b$,
+\begin{equation} \label{EOBSTR}
+\etav(G) > 0 \iff R_D(a,b;x) = 0 \iff \textrm{every coefficient of } R_D \textrm{ vanishes at } (a,b).
+\end{equation}
+Since $q_D$ is homogeneous of degree $|E|$ and $\alpha_e$, $\beta_e$ are homogeneous of degrees $e-1$ and $e$, the coefficient of
+$\prod_{v \in S} x_v$ in $R_D$ is a homogeneous polynomial in $(a,b)$ of degree $|E| - |S|$.
+
+\begin{prop} \label{PNET}
+Let $G$ be the net of Example~\ref{EXNET} and $a < b$ integers. Then $\etav(G) > 0$ if and only if $b = -a$. Moreover, for $b = -a$
+there are polynomials $h_v$ such that
+$$q_D = \sum_{v \in V} h_v\,(x_v^2 - b^2).$$
+\end{prop}
+\begin{proof}
+Take the orientation $A = \{ (t_1,t_2), (t_2,t_3), (t_1,t_3), (t_1,p_1), (t_2,p_2), (t_3,p_3) \}$. Then $q_D$ has $318$ terms, and a
+computer algebra computation gives
+$$R_D = 4(a+b)^2\,\Phi_4 + 4(a-b)^2(a+b)\,\Phi_3 + 4(a+b)^2(a^2 - 3ab + b^2)\,\Phi_2,$$
+where
+\begin{align*}
+\Phi_4 &= t_1t_2p_1p_3 - t_1t_2p_2p_3 - t_1t_3p_1p_2 + t_1t_3p_2p_3 + t_2t_3p_1p_2 - t_2t_3p_1p_3,\\
+\Phi_3 &= -t_1t_2p_1 + t_1t_2p_2 + t_1t_3p_1 - t_1t_3p_3 - t_2t_3p_2 + t_2t_3p_3 \\
+       &\quad + t_1p_1p_2 - t_1p_1p_3 - t_2p_1p_2 + t_2p_2p_3 + t_3p_1p_3 - t_3p_2p_3,\\
+\Phi_2 &= -t_1p_2 + t_1p_3 + t_2p_1 - t_2p_3 - t_3p_1 + t_3p_2
+\end{align*}
+(here each vertex name stands for its variable). These are $24$ distinct multilinear monomials, and the gcd of the coefficients of
+$R_D$ is $4(a+b)$.
+If $a + b \neq 0$, the coefficient $4(a+b)^2$ of $t_1t_2p_1p_3$ is nonzero, so $R_D(a,b;x) \neq 0$ and, by (\ref{EOBSTR}),
+$\etav(G) = 0$. If $a + b = 0$, then $R_D(a,b;x) = 0$, so $\etav(G) > 0$; moreover $(x_v - a)(x_v - b) = x_v^2 - b^2$, and
+Lemma~\ref{LGRID} gives the polynomials $h_v$. (The computation yields cofactors with $112$, $100$, $76$, $48$, $39$ and $24$
+terms for $t_1, t_2, t_3, p_1, p_2, p_3$.)
+\end{proof}
+
+\begin{rem}
+For $b = 1$, the ideal $\langle x_v^2 - 1 : v \in V \rangle$ is the ideal $I_{n2}$ of the square roots of unity $\{-1, 1\}$. Thus
+Proposition~\ref{PNET} is a negative certificate showing that the net is not ``additive colorable with the square roots of
+unity'', although it is additive $2$-colorable. Furthermore, $(-1,1)$ is, up to scaling, the only pair of labels for which this
+happens.
+\end{rem}
+
+\begin{rem}
+In general, let $g_G(a,b)$ be the gcd of the coefficients of $R_D$ (it does not depend on $D$ up to sign, since reversing an arc
+changes the sign of $q_D$). If $R_D = 0$, then $\etav(G) > 0$ for every $a < b$ (e.g.~$G = K_3$). Otherwise, as the coefficients
+are homogeneous binary forms, they factor over $\mathbb{C}$ into linear forms, and their common zeros are exactly the zeros of
+$g_G$. Therefore the pairs $a < b$ with $\etav(G) > 0$ are those with $g_G(a,b) = 0$, and they form finitely many ratios $a : b$.
+\end{rem}
+
+\begin{thebibliography}{99}
+\bibitem{Alon99} N.~Alon, Combinatorial Nullstellensatz, \emph{Combinatorics, Probability and Computing} 8 (1999) 7--29.
+\bibitem{AD16} A.~Ahadi, A.~Dehghan, The inapproximability for the $(0,1)$-additive number,
+\emph{Discrete Mathematics \& Theoretical Computer Science} 17(3) (2016) 217--226.
+\bibitem{CGZ09} S.~Czerwi\'nski, J.~Grytczuk, W.~\.Zelazny, Lucky labelings of graphs, \emph{Information Processing Letters} 109 (2009)
+1078--1081.
+\bibitem{CMMZ02} P.~Coll, J.~Marenco, I.~M\'endez-D\'{\i}az, P.~Zabala, Facets of the graph coloring polytope, \emph{Annals of Operations
+Research} 116 (2002) 79--90.
+\bibitem{KP08} V.~Kaibel, M.~E.~Pfetsch, Packing and partitioning orbitopes, \emph{Mathematical Programming} 114 (2008) 1--36.
+\bibitem{NW88} G.~L.~Nemhauser, L.~A.~Wolsey, \emph{Integer and Combinatorial Optimization}, Wiley, New York, 1988.
+\bibitem{BDEMUV20} M.~Braga, D.~Delle Donne, M.~Escalante, J.~Marenco, M.~E.~Ugarte, M.~C.~Varaldo,
+The minimum chromatic violation problem: a polyhedral approach, \emph{Discrete Applied Mathematics} 281 (2020) 69--80.
+\bibitem{UDE23} M.~E.~Ugarte, D.~Delle Donne, M.~Escalante, Estudios de complejidad del problema de m\'{\i}nima violaci\'on
+crom\'atica en grafos, \emph{Reuni\'on Anual de la Uni\'on Matem\'atica Argentina} (2023), abstract.
+\bibitem{Sev20} D.~Sever\'{\i}n, On the additive chromatic number of several families of graphs, \emph{Information Processing Letters}
+158 (2020) 105937.
+\end{thebibliography}
+
+\end{document}
